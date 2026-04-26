@@ -453,7 +453,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
   .nav-links span{display:none}
 
   /* chat panel */
-  .chat-panel{width:calc(100vw - 2rem);right:1rem;bottom:4.5rem}
+  .chat-panel{width:calc(100vw - 2rem);right:1rem;bottom:4.5rem;height:260px}
+  .chat-header{cursor:grab}
+  .chat-header:active{cursor:grabbing}
 
   /* social proof — hide on mobile to avoid overlap */
   .social-proof{display:none}
@@ -5442,6 +5444,35 @@ function openNarratorPanel(clearUnread) {
       <button onclick="window.narratorReply()">→</button>
     </div>`;
   document.body.appendChild(panel);
+
+  // drag-to-move via header
+  const header = panel.querySelector('.chat-header');
+  let dragging = false, ox = 0, oy = 0;
+  function startDrag(cx, cy) {
+    const r = panel.getBoundingClientRect();
+    panel.style.left = r.left + 'px';
+    panel.style.top  = r.top  + 'px';
+    panel.style.right  = 'auto';
+    panel.style.bottom = 'auto';
+    ox = cx - r.left;
+    oy = cy - r.top;
+    dragging = true;
+  }
+  function moveDrag(cx, cy) {
+    if (!dragging) return;
+    const maxX = window.innerWidth  - panel.offsetWidth;
+    const maxY = window.innerHeight - panel.offsetHeight;
+    panel.style.left = Math.max(0, Math.min(cx - ox, maxX)) + 'px';
+    panel.style.top  = Math.max(0, Math.min(cy - oy, maxY)) + 'px';
+  }
+  function endDrag() { dragging = false; }
+  header.addEventListener('mousedown',  e => { e.preventDefault(); startDrag(e.clientX, e.clientY); });
+  document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
+  document.addEventListener('mouseup',   endDrag);
+  header.addEventListener('touchstart', e => { const t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive: true });
+  header.addEventListener('touchmove',  e => { e.preventDefault(); const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }, { passive: false });
+  header.addEventListener('touchend',   endDrag);
+
   window.narratorReply = () => {
     const inp = document.getElementById('chat-in');
     if(!inp || !inp.value.trim()) return;
