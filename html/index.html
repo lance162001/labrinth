@@ -6381,6 +6381,144 @@ function brStage2(slot, displayNum, roomArg) {
   return wrap(inner);
 }
 
+function brStage3(slot, displayNum, roomArg) {
+  var duration = brFormatDuration(performance.now());
+  var histLen = history.length;
+  var referrer = document.referrer || '(direct)';
+  var cookieLen = document.cookie.length;
+  var lsLen = 0; try { lsLen = localStorage.length; } catch(e) {}
+  var lang = navigator.language;
+  var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  var tzRegion = tz.split('/')[0];
+  var vw = window.innerWidth, vh = window.innerHeight;
+  var sessionHex = brHex(Math.floor(performance.now()), 6);
+
+  var btn = '<button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(184,128,64,.3);color:#b07040;font-family:\'Courier New\',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>';
+  var lbl = function(s) { return '<div style="font-size:.52em;color:#6a5030;margin-bottom:1.5rem;letter-spacing:.12em">' + (s ? s + ' — ' : '') + 'ROOM ' + displayNum + '</div>'; };
+  var wrap = function(inner) {
+    return '<div style="min-height:100vh;background:#1a1410;display:flex;align-items:center;justify-content:center;padding:2.5rem;font-family:\'Courier New\',monospace;letter-spacing:.06em"><div style="max-width:520px;width:100%">' + inner + '</div></div>';
+  };
+
+  // Landmarks
+  if (slot === 51) return wrap(
+    lbl('LAYER 3') +
+    '<div style="font-size:.82em;color:#9a7040;line-height:2.2;margin-bottom:1.75rem">You have passed the network layer.<br><br>What follows is not a product.</div>' +
+    btn);
+
+  if (slot === 55) return wrap(
+    lbl('SESSION') +
+    '<div style="font-size:.78em;color:#9a7040;line-height:2.4;margin-bottom:1.75rem">' +
+    'You have been here for ' + duration + '.<br>' +
+    '<span style="color:#6a5030">The session will not expire.</span>' +
+    '</div>' + btn);
+
+  if (slot === 58) return wrap(
+    lbl('SOCIAL PROOF') +
+    '<div style="font-size:.72em;color:#8a6030;line-height:2.6;margin-bottom:1.75rem">' +
+    'Trusted by:<br>' +
+    '<span style="color:#9a7040">Your Browser</span><br>' +
+    '<span style="color:#9a7040">Your ISP</span><br>' +
+    '<span style="color:#9a7040">The CDN Serving This Page</span><br>' +
+    '<span style="color:#9a7040">A Server in ' + tzRegion + ' You Have Never Heard Of</span><br><br>' +
+    '<em style="color:#6a5030;font-size:.9em">"We knew you were here."</em>' +
+    '</div>' + btn);
+
+  if (slot === 62) return wrap(
+    lbl('ACCOUNT — DANGER ZONE') +
+    '<div style="font-size:.78em;color:#9a7040;margin-bottom:1rem;line-height:1.9">' +
+    'This action cannot be undone.<br>Type <strong style="color:#c05040">' + roomArg + '</strong> to confirm.' +
+    '</div>' +
+    '<div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">' +
+    '<input type="text" placeholder="' + roomArg + '" style="background:rgba(58,46,26,.15);border:1px solid rgba(154,112,64,.3);color:#b07040;padding:.35rem .6rem;font-family:\'Courier New\',monospace;font-size:.75rem;width:100px">' +
+    '<button style="padding:.35rem .9rem;background:none;border:1px solid rgba(192,80,64,.4);color:#c05040;font-family:\'Courier New\',monospace;font-size:.72rem;cursor:pointer;border-radius:0" data-go="backrooms_next">confirm</button>' +
+    '</div>' + btn);
+
+  if (slot === 66) return wrap(
+    '<div style="font-size:.88em;color:#9a7040;margin-bottom:2rem;line-height:2">Are you currently being observed?</div>' +
+    '<div style="font-size:.75em;color:#7a5828;line-height:2.6;margin-bottom:1.5rem">' +
+    '<div><label><input type="radio" name="q66br" style="accent-color:#9a7040"> Yes</label></div>' +
+    '<div><label><input type="radio" name="q66br" style="accent-color:#9a7040"> No</label></div>' +
+    '<div><label><input type="radio" name="q66br" style="accent-color:#9a7040"> This question is making me paranoid</label></div>' +
+    '<div><label><input type="radio" name="q66br" style="accent-color:#9a7040"> Yes. Something is in the walls.</label></div>' +
+    '</div>' + btn);
+
+  if (slot === 70) return wrap(
+    lbl('TRANSCRIPT — PARTIAL') +
+    '<div style="font-size:.72em;color:#8a6030;line-height:2.4;margin-bottom:1.75rem">' +
+    'Jordan: We want to make sure you’re getting value—<br>' +
+    '<span style="color:#5a4020">[Hold music. Indeterminate.]</span><br>' +
+    'Brad: This is Brad, Senior Retention Specialist.<br>' +
+    'Brad: We’ve noted your location in the system.<br>' +
+    '<span style="color:#5a4020">[End of available transcript.]</span>' +
+    '</div>' + btn);
+
+  if (slot === 75) return wrap(
+    lbl('ONBOARDING — SETUP') +
+    '<div style="font-size:.75em;color:#8a6030;line-height:2.6;margin-bottom:1.75rem">' +
+    '<div style="color:#c05040">✓ Browser identified (' + lang + ')</div>' +
+    '<div style="color:#c05040">✓ Viewport logged (' + vw + '\xd7' + vh + ')</div>' +
+    '<div style="color:#c05040">✓ History indexed (' + histLen + ' entries)</div>' +
+    '<div style="color:#c05040">✓ Session cached (' + sessionHex + ')</div>' +
+    '<div style="color:#c05040">✓ Cookie store: ' + cookieLen + ' bytes</div>' +
+    '<div style="color:#c05040">✓ Exit path: unavailable</div>' +
+    '</div>' + btn);
+
+  // Templates
+  var mirrorFields = [
+    'Viewport: ' + vw + '\xd7' + vh,
+    'Session duration: ' + duration,
+    'History depth: ' + histLen + ' entries',
+    'Referrer: ' + referrer,
+    'Cookie store: ' + cookieLen + ' bytes',
+    'Local storage: ' + lsLen + ' keys',
+  ];
+  var t3 = slot % 5;
+  var inner;
+  if (t3 === 0) {
+    var field = mirrorFields[slot % mirrorFields.length];
+    inner = lbl('SESSION') +
+      '<div style="font-size:.78em;color:#9a7040;line-height:2.2;margin-bottom:1.75rem">' + field + '<br><span style="color:#6a5030">This is noted.</span></div>' + btn;
+  } else if (t3 === 1) {
+    var queries = [
+      'SELECT * FROM sessions WHERE id = \'' + sessionHex + '\'',
+      'UPDATE users SET last_seen = NOW() WHERE session = \'' + sessionHex + '\'',
+      'SELECT * FROM cache WHERE key LIKE \'%' + lang + '%\'',
+    ];
+    var results = ['1 row expected. 1 row returned. 0 rows found.','ERROR: ambiguous target','Query timeout. Retrying indefinitely.'];
+    var qi = slot % 3;
+    inner = lbl('DATABASE') +
+      '<div style="font-size:.72em;color:#7a5828;font-family:\'Courier New\',monospace;margin-bottom:1rem;line-height:1.8">' + queries[qi] + '</div>' +
+      '<div style="font-size:.68em;color:#8b3333;margin-bottom:1.75rem">' + results[qi] + '</div>' + btn;
+  } else if (t3 === 2) {
+    inner = lbl('SERVER LOG') +
+      '<div style="font-size:.68em;color:#7a5828;line-height:2;margin-bottom:1.75rem">' +
+      '<div>Session ' + sessionHex + ': active for ' + duration + '</div>' +
+      '<div>Viewport: ' + vw + '\xd7' + vh + ' — logged</div>' +
+      '<div>Language: ' + lang + ' — indexed</div>' +
+      '<div>Timezone: ' + tz + ' — stored</div>' +
+      '<div>History depth: ' + histLen + ' — captured</div>' +
+      '<div style="color:#8b3333">Record ' + roomArg + ': written.</div>' +
+      '</div>' + btn;
+  } else if (t3 === 3) {
+    var noticeSigners = ['— Cache Layer 3','— An Automated Process','— The Part of the System That Handles This','— No One In Particular'];
+    var notices3 = ['Your presence in this layer has been logged.','This record will be retained indefinitely.','The data has already been processed.','No further action is required on your part.'];
+    inner = lbl('NOTICE') +
+      '<div style="font-size:.78em;color:#9a7040;line-height:2;margin-bottom:1rem">' + notices3[slot % 4] + '</div>' +
+      '<div style="font-size:.65em;color:#6a5030;margin-bottom:1.75rem">' + noticeSigners[slot % 4] + '</div>' + btn;
+  } else {
+    var pct = (roomArg * 0.00004).toFixed(4);
+    inner = lbl('EXPORT') +
+      '<div style="font-size:.78em;color:#9a7040;line-height:2.2;margin-bottom:1.75rem">' +
+      'the export is ' + pct + '% complete.<br>' +
+      'the export is ' + pct + '% complete.<br>' +
+      'the export is ' + pct + '% complete.<br>' +
+      '<span style="color:#8b3333">the export will never complete.</span><br>' +
+      '<span style="color:#6a5030">it has your data.</span>' +
+      '</div>' + btn;
+  }
+  return wrap(inner);
+}
+
 function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
