@@ -40,6 +40,37 @@ function markNarratorMilestone(path, key) {
   S.narratorGlitch = _glitchTier(max);
 }
 
+function glitchText(str, severity) {
+  if (!severity) return str;
+  const seed = S.narratorMsgCount || 0;
+  let words = str.split(' ');
+
+  const di = seed % words.length;
+  const dw = words[di];
+  if (dw.length > 3) {
+    const mid = Math.floor(dw.length / 2);
+    words[di] = dw.slice(0, mid) + dw[mid] + dw.slice(mid);
+  }
+  const ci = (seed + 3) % words.length;
+  const cw = words[ci];
+  if (ci !== di && cw.length > 2 && /^[a-zA-Z]/.test(cw)) {
+    words[ci] = cw[0] + '̶' + cw.slice(1);
+  }
+
+  if (severity < 2) return words.join(' ');
+
+  let out = words.join(' ');
+  const sentences = out.split('. ');
+  if (sentences.length > 1) {
+    const si = seed % sentences.length;
+    const lead = sentences[si].split(' ').slice(0, 3).join(' ');
+    sentences[si] = lead + ' — ' + sentences[si];
+    out = sentences.join('. ');
+  }
+  if (out.endsWith('.')) out = out.slice(0, -1) + ' —';
+  return out;
+}
+
 const NARRATOR_CORRECT = ['As predicted.','Called it.','I knew it.','Yes.','Mm.','As expected.','The narrator was right.'];
 const NARRATOR_WRONG   = ['Oh.','Hmm.','...Interesting.','That wasn\'t what I predicted.','The narrator notes this deviation.','Not the expected path.','The narrator was mistaken. This is fine.','Unexpected.'];
 const NARRATOR_USER_REPLIES = [
