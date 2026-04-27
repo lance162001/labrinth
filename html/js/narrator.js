@@ -2,6 +2,44 @@
 
 // ─── NARRATOR ───────────────────────────────────────────────────
 
+const PATH_MILESTONES = {
+  onboarding:  ['signup','signup_3','signup_7','verify_bypass','onboard_workspace',
+                 'onboard_calendar','onboard_teammates','onboard_quiz','onboard_done','dashboard'],
+  delete:      ['delete_account','del_schedule','del_done','del_jordan_ring','del_call','del_committee'],
+  support:     ['help','support_ticket','ticket_needs_info','ticket_escalated',
+                 'ticket_merged','ticket_appeal','ticket_appeal_denied'],
+  unsubscribe: ['unsubscribe','unsub_2','unsub_3','unsub_captcha','unsub_done'],
+  navigator:   ['main','features','signin','contact_sales','contact_sales_sent'],
+  adventure:   ['adv_intro','adv_lobby','adv_take_keycard','adv_try_elevator','adv_try_stairs',
+                 'adv_breakroom','adv_examine_whiteboard','adv_take_badge','adv_floor2','adv_ending'],
+  survey:      ['survey_enter','survey_q8','survey_q15','survey_q22','survey_done'],
+  backrooms:   ['br_enter','br_s1','br_s1_mid','br_s2','br_s2_mid',
+                 'br_s3','br_s3_mid','br_s4','br_s4_mid','br_exit'],
+};
+
+const _MILESTONE_LOOKUP = {};
+Object.entries(PATH_MILESTONES).forEach(([path, keys]) => {
+  keys.forEach(k => {
+    if (!_MILESTONE_LOOKUP[k]) _MILESTONE_LOOKUP[k] = [];
+    _MILESTONE_LOOKUP[k].push(path);
+  });
+});
+
+function _glitchTier(max) {
+  return max <= 2 ? 0 : max <= 5 ? 1 : max <= 8 ? 2 : max <= 10 ? 3 : 4;
+}
+
+function markNarratorMilestone(path, key) {
+  if (!S.pathMilestonesSeen) S.pathMilestonesSeen = new Set();
+  const token = path + ':' + key;
+  if (S.pathMilestonesSeen.has(token)) return;
+  S.pathMilestonesSeen.add(token);
+  if (!S.pathDepth) S.pathDepth = {};
+  S.pathDepth[path] = (S.pathDepth[path] || 0) + 1;
+  const max = Math.max(0, ...Object.values(S.pathDepth));
+  S.narratorGlitch = _glitchTier(max);
+}
+
 const NARRATOR_CORRECT = ['As predicted.','Called it.','I knew it.','Yes.','Mm.','As expected.','The narrator was right.'];
 const NARRATOR_WRONG   = ['Oh.','Hmm.','...Interesting.','That wasn\'t what I predicted.','The narrator notes this deviation.','Not the expected path.','The narrator was mistaken. This is fine.','Unexpected.'];
 const NARRATOR_USER_REPLIES = [
@@ -78,6 +116,9 @@ function narratorEnter(key) {
 }
 
 function _narratorDo(key) {
+  const _miPaths = _MILESTONE_LOOKUP[key];
+  if (_miPaths) _miPaths.forEach(p => markNarratorMilestone(p, key));
+
   const entry = NARRATOR[key];
   if(!entry) return;
   let delay = 300;
