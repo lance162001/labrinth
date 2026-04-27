@@ -6519,6 +6519,133 @@ function brStage3(slot, displayNum, roomArg) {
   return wrap(inner);
 }
 
+function brStage4(slot, displayNum, roomArg) {
+  var cores = navigator.hardwareConcurrency || 4;
+  var mem = navigator.deviceMemory != null ? navigator.deviceMemory : 'unknown';
+  var colorDepth = screen.colorDepth || 24;
+  var pixelRatio = window.devicePixelRatio || 1;
+  var cookieEnabled = navigator.cookieEnabled;
+  var bat = S.brBattery;
+  var batStr = bat ? (bat.level + '% — ' + (bat.charging ? 'charging' : 'discharging')) : 'unavailable';
+  var duration = brFormatDuration(performance.now());
+  var vw = window.innerWidth, vh = window.innerHeight;
+
+  var exitInput = '<div style="margin-top:3rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.06)">' +
+    '<div style="font-size:.52em;letter-spacing:.1em;color:#3a2c10;margin-bottom:.6rem">EMERGENCY EXIT PROTOCOL</div>' +
+    '<input id="br-exit-input" type="text" autocomplete="off" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#7a5020;padding:.35rem .6rem;font-family:\'Courier New\',monospace;font-size:.72rem;letter-spacing:.06em;width:150px" placeholder="access code">' +
+    '<button onclick="(function(){var v=document.getElementById(\'br-exit-input\').value.trim().toUpperCase();if(v===\'LEVEL0\'){scene_backrooms_exit();}else{var el=document.getElementById(\'br-exit-input\');el.style.border=\'1px solid #8b3333\';setTimeout(function(){el.style.border=\'1px solid rgba(255,255,255,.08)\'},600);}})()" style="background:none;border:1px solid rgba(58,46,26,.2);color:#4a3010;padding:.35rem .75rem;font-family:\'Courier New\',monospace;font-size:.68rem;cursor:pointer;margin-left:.4rem">submit</button>' +
+    '</div>';
+
+  var btn = function(lbl) {
+    lbl = lbl !== undefined ? lbl : 'keep going';
+    return '<button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(255,255,255,.07);color:#4a3818;font-family:\'Courier New\',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">' + lbl + '</button>';
+  };
+  var roomLabel = function(s) {
+    return '<div style="font-size:.52em;color:#3a2c10;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ' + displayNum + (s ? ' — ' + s : '') + '</div>';
+  };
+  var wrap = function(inner) {
+    return '<div style="min-height:100vh;background:#0d0a06;display:flex;align-items:center;justify-content:center;padding:2.5rem;font-family:\'Courier New\',monospace;letter-spacing:.12em;animation:br-deep-flicker 12s infinite"><div style="max-width:480px;width:100%">' + inner + '</div></div>';
+  };
+
+  // Landmarks
+  if (slot === 76) return wrap(
+    roomLabel() +
+    '<div style="font-size:.78em;color:#6a4818;line-height:2.4;margin-bottom:1.75rem">' +
+    'you have been here for ' + duration + '.<br>' +
+    '<span style="color:#3a2c10">the exit is here.</span>' +
+    '</div>' + btn() + exitInput);
+
+  if (slot === 80) return wrap(
+    roomLabel('CONFIRMATION') +
+    '<div style="font-size:.75em;color:#6a4818;line-height:2.4;margin-bottom:1.75rem">' +
+    'Application submitted!<br>' +
+    'Position: [undefined]<br>' +
+    '<span style="color:#3a2c10">We’ll be in touch in [NaN]–[NaN] weeks.</span><br>' +
+    '<span style="color:#3a2c10">The assessment is still pending.</span>' +
+    '</div>' + btn() + exitInput);
+
+  if (slot === 84) return wrap(
+    '<div style="font-size:.52em;color:#1a1408;margin-bottom:3rem;letter-spacing:.2em">Nexus</div>' +
+    '<div style="font-size:.52em;color:#2a1e08;margin-bottom:.5rem;letter-spacing:.12em">ROOM ' + displayNum + '</div>' +
+    btn() + exitInput);
+
+  if (slot === 88) return wrap(
+    roomLabel() +
+    '<div style="font-size:.78em;color:#6a4818;line-height:2;margin-bottom:.5rem">the code is</div>' +
+    '<span style="font-size:.78em;color:#0d0a06;background:#0d0a06;user-select:text;margin-bottom:1.75rem;display:inline-block">LEVEL0</span>' +
+    '<div style="margin-top:1.75rem">' + btn() + '</div>' + exitInput);
+
+  if (slot === 92) return wrap(
+    roomLabel() +
+    '<div style="font-size:.78em;color:#6a4818;line-height:2.4;margin-bottom:1.75rem">' +
+    'you have been here before.<br>' +
+    'you will be here again.<br>' +
+    '<span style="color:#3a2c10">there is no other direction.</span>' +
+    '</div>' + btn() + exitInput);
+
+  if (slot === 96) return wrap(
+    roomLabel('DIAGNOSTIC CONSOLE') +
+    '<div style="font-size:.75em;color:#2a1e08;line-height:2;margin-bottom:.4rem">No errors found.</div>' +
+    '<div style="font-size:.65em;color:#1a1208;font-style:italic;margin-bottom:1.75rem">(you never left.)</div>' +
+    btn() + exitInput);
+
+  if (slot === 100) return wrap(
+    roomLabel() +
+    '<div style="font-size:.72em;color:#4a3818;line-height:2.4;margin-bottom:1.75rem">' +
+    'end of indexed range.<br><span style="color:#3a2c10">continuing.</span>' +
+    '</div>' + btn('continue') + exitInput);
+
+  // Templates
+  var frags = [
+    'Jordan begins the retention scri—',
+    'Step 8 of —',
+    'All systems opera—',
+    'Your account has been —',
+    'Please type DELETE to —',
+    'The export is —',
+    'We’ll be in touch in —',
+    'Session expires in —',
+  ];
+  var dissolvedNotices = [
+    'The record has been updated.',
+    'Your request has been received.',
+    'Processing is complete.',
+    'The action has been logged.',
+    'This notification was sent automatically.',
+  ];
+  var t4 = slot % 5;
+  var inner;
+  if (t4 === 0) {
+    inner = roomLabel() +
+      '<div style="font-size:.72em;color:#4a3818;line-height:2.6;margin-bottom:1.75rem">' +
+      'Cores: ' + cores + '<br>' +
+      'Memory: ' + mem + (mem !== 'unknown' ? 'GB' : '') + '<br>' +
+      'Color depth: ' + colorDepth + 'bit<br>' +
+      'Pixel ratio: ' + pixelRatio + '<br>' +
+      'Battery: ' + batStr + '<br>' +
+      'Cookies: ' + (cookieEnabled ? 'enabled' : 'disabled') +
+      '</div>' + btn() + exitInput;
+  } else if (t4 === 1) {
+    inner = roomLabel() +
+      '<div style="font-size:.72em;color:#3a2c10;line-height:2;margin-bottom:1.75rem">' + dissolvedNotices[slot % dissolvedNotices.length] + '</div>' +
+      btn() + exitInput;
+  } else if (t4 === 2) {
+    inner = roomLabel() +
+      '<div style="font-size:.78em;color:#4a3818;line-height:2;margin-bottom:1.75rem">' + frags[slot % frags.length] + '</div>' +
+      btn() + exitInput;
+  } else if (t4 === 3) {
+    inner = roomLabel() +
+      '<div style="display:flex;gap:1.5rem;margin-bottom:1.75rem">' +
+      '<button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(255,255,255,.07);color:#4a3818;font-family:\'Courier New\',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ return ]</button>' +
+      '<button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(255,255,255,.07);color:#4a3818;font-family:\'Courier New\',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ return ]</button>' +
+      '</div>' + exitInput;
+  } else {
+    inner = roomLabel() +
+      '<div style="margin-bottom:1.75rem">' + btn('') + '</div>' + exitInput;
+  }
+  return wrap(inner);
+}
+
 function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
