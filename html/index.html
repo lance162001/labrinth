@@ -6252,6 +6252,135 @@ function brStage1(slot, displayNum, roomArg) {
   return shell(content);
 }
 
+function brStage2(slot, displayNum, roomArg) {
+  const region = brTimezoneRegion();
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const lang = navigator.language;
+  const conn = (navigator.connection && navigator.connection.effectiveType) || 'unknown';
+  const online = navigator.onLine ? 'true' : 'false';
+  const faultCode = brFaultCode(roomArg);
+  const ls = (0.02 + (slot - 26) * 0.007).toFixed(3);
+  // Background darkens gradually from warm cream to deep amber across 25 rooms
+  var bgIdx = Math.min(slot - 26, 24);
+  var r = Math.round(245 - bgIdx * 3), g = Math.round(240 - bgIdx * 4), b = Math.round(224 - bgIdx * 6);
+  var bg = 'rgb(' + r + ',' + g + ',' + b + ')';
+
+  var btn = '<button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:\'Courier New\',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>';
+  var hdr = function(lbl) { return '<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — ' + lbl + ' — ROOM ' + displayNum + '</div>'; };
+  var wrap = function(inner) {
+    return '<div style="min-height:100vh;background:' + bg + ';display:flex;align-items:center;justify-content:center;padding:2.5rem;font-family:\'Courier New\',monospace;letter-spacing:' + ls + 'em"><div style="max-width:540px;width:100%">' + inner + '</div></div>';
+  };
+
+  // Landmarks
+  if (slot === 26) return wrap(
+    hdr('NETWORK DIAGNOSTIC — LAYER 2') +
+    '<div style="font-size:.9rem;color:#4a3a1a;margin-bottom:1rem;line-height:1.9">You have passed the application layer.</div>' +
+    '<div style="font-size:.78rem;color:#7a6040;line-height:1.9;margin-bottom:2rem">What follows is not intended for users.</div>' +
+    btn);
+
+  if (slot === 30) {
+    var now = new Date();
+    var rows = '';
+    for (var i = 18; i >= 0; i--) {
+      var t2 = new Date(now.getTime() - i * 47000);
+      rows += '<div>' + t2.toISOString().replace('T',' ').slice(0,19) + ' &nbsp;User navigated deeper.</div>';
+    }
+    return wrap(
+      hdr('CHANGELOG — SYSTEM') +
+      '<div style="font-size:.68rem;color:#7a6040;line-height:2;margin-bottom:1.25rem;max-height:300px;overflow:hidden">' + rows +
+      '<div style="color:#8b3333">' + now.toISOString().replace('T',' ').slice(0,19) + ' &nbsp;User navigated deeper.</div>' +
+      '</div>' + btn);
+  }
+
+  if (slot === 35) return wrap(
+    hdr('ROADMAP') +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem;font-size:.7rem;color:#7a6040">' +
+    '<div><div style="font-size:.6rem;letter-spacing:.08em;margin-bottom:.5rem;color:#9a8060">IN TRANSIT</div><div style="margin-bottom:.5rem">Resolve DNS ambiguity (since 2019)</div><div style="margin-bottom:.5rem">Drain legacy session pool</div><div>Patch orphaned cache entries</div></div>' +
+    '<div><div style="font-size:.6rem;letter-spacing:.08em;margin-bottom:.5rem;color:#9a8060">ROUTING</div><div style="margin-bottom:.5rem">Migrate CDN region (blocked)</div><div style="margin-bottom:.5rem">Re-index lost manifests</div><div>Restore TTL integrity</div></div>' +
+    '<div><div style="font-size:.6rem;letter-spacing:.08em;margin-bottom:.5rem;color:#9a8060">LOST IN QUEUE</div><div style="margin-bottom:.5rem">Decommission layer 0</div><div style="margin-bottom:.5rem">Archive ghost sessions</div><div>Close Ticket #0003</div></div>' +
+    '</div>' + btn);
+
+  if (slot === 38) return wrap(
+    hdr('SUPPORT — AUTO-TICKET') +
+    '<div style="font-size:.8rem;color:#4a3a1a;line-height:2.2;font-family:\'Courier New\',monospace;margin-bottom:1.25rem">' +
+    '&gt; Ticket #' + displayNum + ' opened automatically<br>' +
+    '&gt; Analyzing issue…<br>' +
+    '&gt; Ticket #' + displayNum + ' resolved: <em style="color:#8b3333">you are not supposed to be here</em><br>' +
+    '&gt; Closing ticket.</div>' + btn);
+
+  if (slot === 42) return wrap(
+    hdr('TERMS — PENDING') +
+    '<div style="font-size:.88rem;color:#4a3a1a;margin-bottom:1.25rem;line-height:2.1">' +
+    'P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp;—<br>' +
+    'P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp;—<br>' +
+    'P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp; t e r m s</div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-end">' +
+    '<button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:\'Courier New\',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ R e c e d e ]</button>' +
+    '<div><button style="padding:.55rem 1.4rem;background:none;border:1px solid rgba(154,128,96,.3);color:rgba(74,58,26,.3);font-family:\'Courier New\',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ C o n t i n u e ]</button>' +
+    '<div style="font-size:.55rem;color:#9a8060;text-align:right;margin-top:.3rem">(goes forward)</div></div></div>');
+
+  if (slot === 46) return wrap(
+    hdr('CONNECTION STATUS') +
+    '<div style="font-size:.78rem;color:#4a3a1a;line-height:2.4;margin-bottom:1.5rem">' +
+    'Your connection: ' + conn + '.<br>' +
+    'Language: ' + lang + '.<br>' +
+    'Timezone: ' + tz + '.<br>' +
+    'Online: ' + online + '.<br>' +
+    '<span style="color:#9a8060;font-size:.9em">None of this is unusual.</span>' +
+    '</div>' + btn);
+
+  if (slot === 50) {
+    var events50 = ['GET /home 200 OK','GET /cookies 200 OK','GET /main 200 OK','GET /pricing 200 OK','GET /signup 200 OK','GET /signup_2 200 OK','GET /survey/q14 200 OK','GET /delete_account 200 OK','GET /support_ticket 200 OK','GET /help 200 OK','GET /backrooms/room/00047 200 OK','GET /backrooms/room/00048 200 OK','GET /backrooms/room/00049 200 OK'];
+    return '<div style="min-height:100vh;background:' + bg + ';font-family:\'Courier New\',monospace;padding:3rem 2.5rem;letter-spacing:' + ls + 'em">' +
+      '<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — ACCESS LOG — ROOM ' + displayNum + '</div>' +
+      '<div style="font-size:.72rem;color:#7a6040;line-height:2;margin-bottom:1rem">' +
+      events50.map(function(e){return '<div>'+e+'</div>';}).join('') +
+      '<div style="color:#4a3a1a">GET /backrooms/room/00050 200 OK &nbsp;—&nbsp; you are reading this log.</div>' +
+      '<div style="color:#8b3333">GET /backrooms/room/00051 200 OK &nbsp;—&nbsp; already written.</div>' +
+      '</div>' +
+      '<div style="margin-top:2rem">' + btn + '</div></div>';
+  }
+
+  // Templates (slot % 5)
+  var t2 = slot % 5;
+  var inner;
+  if (t2 === 0) {
+    inner = hdr('DIAGNOSTIC CONSOLE') +
+      '<div style="font-size:.9rem;color:#4a3a1a;margin-bottom:1rem;line-height:1.9">Pipeline fault detected.<br>Attempting recovery.</div>' +
+      '<div style="font-size:.72rem;color:#7a6040;margin-bottom:2rem;line-height:1.9">Fault code: ' + faultCode + '<br>Origin: unknown<br>Time elapsed: indeterminate</div>' + btn;
+  } else if (t2 === 1) {
+    var latency = roomArg % 800 + 200;
+    var cacheState = roomArg % 3 === 0 ? 'Cache miss.' : 'Cache stale.';
+    inner = hdr('ROUTING') +
+      '<div style="font-size:.78rem;color:#4a3a1a;line-height:2.2;margin-bottom:1.5rem">' +
+      'Request routed through ' + region + ' edge.<br>' +
+      'Round-trip: ' + latency + 'ms.<br>' + cacheState + '</div>' + btn;
+  } else if (t2 === 2) {
+    var dnsHex = brHex(roomArg * 13, 8).toLowerCase();
+    var year = 2017 + (slot % 6);
+    inner = hdr('DNS LOOKUP') +
+      '<div style="font-size:.78rem;color:#4a3a1a;line-height:2.2;margin-bottom:1.5rem">' +
+      'Domain: nexus-' + dnsHex.slice(0,8) + '.internal<br>' +
+      'Record: CNAME → nexus-' + dnsHex.slice(0,4) + '.cdn.internal<br>' +
+      'TTL: indeterminate<br>' +
+      '<span style="color:#9a8060">This record has been propagating since ' + year + '.</span>' +
+      '</div>' + btn;
+  } else if (t2 === 3) {
+    inner = hdr('SUPPORT CHAT — CONNECTED') +
+      '<div style="border:1px solid rgba(154,128,96,.35);padding:1rem;margin-bottom:1.25rem;font-size:.78rem;color:#6a5040;line-height:2">' +
+      '<div><strong>Nexus Bot:</strong> Still looking into it…</div>' +
+      '<div style="margin-top:.75rem;font-size:.58rem;color:#9a8060">Message sent at an unknown time &nbsp;\xb7&nbsp; No agents available</div>' +
+      '</div>' + btn;
+  } else {
+    inner = hdr('BLOG — COMING SOON') +
+      '<div style="font-size:.78rem;color:#4a3a1a;margin-bottom:1rem">Stay in the loop.</div>' +
+      '<input type="email" value="' + lang + '" style="background:rgba(58,46,26,.06);border:1px solid rgba(154,128,96,.4);color:#4a3a1a;padding:.4rem .7rem;font-family:\'Courier New\',monospace;font-size:.75rem;width:200px" readonly>' +
+      '<div style="font-size:.6rem;color:#9a8060;margin-top:.4rem">Subscribing: ' + lang + '</div>' +
+      '<div style="margin-top:1rem">' + btn + '</div>';
+  }
+  return wrap(inner);
+}
+
 function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
