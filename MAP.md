@@ -571,6 +571,44 @@ The exit door opens. A long corridor. Another door. The player is in the lobby. 
 
 ---
 
+### Path 8 — The Backrooms
+*A liminal space that was always underneath the site.*
+
+```
+dashboard → data_export → [wait 45s] → bar overflows to 107% → "Open diagnostic console"
+          → backrooms_enter [terminal boot sequence]
+          → backrooms Room 00001 [Stage 1: SaaS chrome, subtly wrong]
+          → backrooms Room 00002 [two identical Proceed buttons]
+          → backrooms Room 00003 [normal]
+          → backrooms Room 00004 [logo missing]
+          → backrooms Room 00005 ["Getting colder." Trial: 14 days. Always.]
+          → backrooms Room 00006 [Stage 2: yellowing, letter-spacing widens]
+          → backrooms Room 00007 [auto-ticket: "you are not supposed to be here"]
+          → backrooms Room 00008 [support chat: "Still looking into it…" No agents.]
+          → backrooms Room 00009 ["Recede" button (goes forward), "Continue" (faded)]
+          → backrooms Room 00010 [no windows, no doors, there is a button]
+          → backrooms Room 00011 [Stage 3: full backrooms aesthetic, flicker CSS]
+          → backrooms Room 00012 [export: 0% complete. export will never complete.]
+          → backrooms Room 00013 [something in the room with you]
+          → backrooms Room 00014 [corrupted Unicode strikethrough text]
+          → backrooms Room 00015 [hint: "the code is [redacted]"] → loops to Room 05001
+          → ... [rooms cycle, display number jumps by ~5000 per loop]
+
+          exit (Stage 3 rooms only): type LEVEL0 → "Export complete. 1 file downloaded." → dashboard
+
+cross-path: survey Q19 ("Are you currently being observed?") gains hidden option
+            "Yes. Something is in the walls. The code is LEVEL0."
+            — only shown if S.brVisited === true (user has entered the backrooms)
+```
+
+**Entry:** Discoverable only by waiting 45 seconds on the Export Data page. No hint anywhere in the site.
+
+**The exit code** is redacted in the page source of Room 15 (text colored to match background). It is only clearly revealed via the survey cross-path, which itself requires having visited the backrooms first.
+
+**Narrative structure:** false maintenance task → disorientation → liminality → endless void → conditional escape.
+
+---
+
 ## Dead Ends
 
 Locations the site routes to but from which there is no further progress:

@@ -496,6 +496,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
   .gs-stage{padding:1rem .75rem 2.5rem}
   .gs-catchphrase{font-size:clamp(1.2rem,5vw,1.8rem)}
 }
+/* ── backrooms ── */
+body.br-mode{background:#e8d5a3}
+@keyframes br-flicker{0%,94%,96%,100%{filter:brightness(1)}95%{filter:brightness(.85)}}
 </style>
 </head>
 <body>
@@ -533,6 +536,9 @@ const S = {
   billingVisits: 0,
   advInventory: [],
   inAdventure: false,
+  brRoom: 0,
+  brVisited: false,
+  exportGlitchTimer: null,
 };
 
 function incDepth() {
@@ -4775,7 +4781,8 @@ function renderSurveyStep() {
   } else if (q.type === 'nps') {
     fieldHtml = `<div class="nps-row">${[...Array(11).keys()].map(n=>`<button class="nps-btn" onclick="this.parentElement.querySelectorAll('.nps-btn').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">${n}</button>`).join('')}</div><div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>`;
   } else if (q.type === 'radio') {
-    fieldHtml = `<div class="survey-opts">${q.opts.map(o=>`<label class="survey-opt"><input type="radio" name="sq"> ${o}</label>`).join('')}</div>`;
+    const opts = (S.surveyStep === 18 && S.brVisited) ? [...q.opts, 'Yes. Something is in the walls. The code is LEVEL0.'] : q.opts;
+    fieldHtml = `<div class="survey-opts">${opts.map(o=>`<label class="survey-opt"><input type="radio" name="sq"> ${o}</label>`).join('')}</div>`;
   } else if (q.type === 'check') {
     fieldHtml = `<div class="survey-opts">${q.opts.map(o=>`<label class="survey-opt"><input type="checkbox"> ${o}</label>`).join('')}</div>`;
   } else if (q.type === 'text') {
@@ -5594,6 +5601,7 @@ function scene_data_export() {
   incDepth();
   clearSocialProof();
   setOverlay('');
+  if (S.exportGlitchTimer) { clearTimeout(S.exportGlitchTimer); S.exportGlitchTimer = null; }
   root.innerHTML = dashNavHTML() + `
   <div class="dashboard-layout">
     ${dashSidebar('export')}
@@ -5602,15 +5610,19 @@ function scene_data_export() {
       <div style="max-width:520px">
         <p style="font-size:.875rem;color:var(--g500);margin-bottom:1.5rem;line-height:1.5">Download a copy of all your Nexus data, including projects, comments, settings, and metadata.</p>
         ${S.exportRequested ? `
-          <div style="border:1px solid var(--g200);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem">
+          <div style="border:1px solid var(--g200);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem" id="exp-card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
               <div style="font-weight:600">Export Request</div>
               <span class="badge badge-gray">Processing</span>
             </div>
             <div style="height:6px;background:var(--g100);border-radius:4px;margin-bottom:.5rem"><div style="height:6px;background:var(--blue);border-radius:4px;width:0%;transition:width .3s" id="exp-bar"></div></div>
-            <div style="font-size:.75rem;color:var(--g400)">0% complete · Estimated time: 3–5 business days</div>
+            <div style="font-size:.75rem;color:var(--g400)" id="exp-status">0% complete · Estimated time: 3–5 business days</div>
           </div>
-          <div class="alert alert-info" style="font-size:.8rem">An export is already in progress. Please wait for it to complete before requesting a new one.</div>` : `
+          <div class="alert alert-info" style="font-size:.8rem" id="exp-alert">An export is already in progress. Please wait for it to complete before requesting a new one.</div>
+          <div id="br-door" style="display:none;margin-top:1.25rem">
+            <div class="alert" style="background:#fef3c7;border-color:#f59e0b;color:#92400e;font-size:.8rem;margin-bottom:1rem">⚠ Something went wrong with the export pipeline. Error: EXPORT_OVERFLOW.</div>
+            <button class="btn btn-secondary" onclick="scene_backrooms_enter()">Open diagnostic console →</button>
+          </div>` : `
           <div style="border:1px solid var(--g200);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem">
             <div style="font-weight:600;margin-bottom:.75rem">What's included:</div>
             <ul style="font-size:.875rem;color:var(--g600);padding-left:1.25rem;line-height:2">
@@ -5628,6 +5640,34 @@ function scene_data_export() {
     </div>
   </div>`;
   injectChatBtn();
+  if (S.exportRequested) {
+    S.exportGlitchTimer = setTimeout(() => {
+      const bar = document.getElementById('exp-bar');
+      const status = document.getElementById('exp-status');
+      const alert = document.getElementById('exp-alert');
+      const door = document.getElementById('br-door');
+      if (!bar) return;
+      let pct = 0;
+      const iv = setInterval(() => {
+        pct += Math.random() * 9 + 3;
+        if (pct >= 107) {
+          pct = 107;
+          clearInterval(iv);
+          bar.style.width = '107%';
+          bar.style.background = 'var(--red)';
+          bar.style.borderRadius = '4px';
+          if (status) status.textContent = 'Error — pipeline fault. Code: EXPORT_OVERFLOW.';
+          if (alert) alert.style.display = 'none';
+          if (door) door.style.display = 'block';
+        } else {
+          bar.style.width = pct + '%';
+          if (pct > 80) bar.style.background = 'var(--yellow)';
+          if (pct > 98) bar.style.background = 'var(--red)';
+          if (status) status.textContent = Math.round(pct) + '% complete' + (pct > 85 ? ' · overrun detected…' : ' · Estimated time: 3–5 business days');
+        }
+      }, 280);
+    }, 45000);
+  }
 }
 
 function scene_export_request() {
@@ -6015,6 +6055,216 @@ function scene_adv_ending() {
   setOverlay('');
 }
 
+// ────────────── BACKROOMS ──────────────
+
+function scene_backrooms_enter() {
+  incDepth();
+  S.brVisited = true;
+  S.brRoom = 0;
+  if (S.exportGlitchTimer) { clearTimeout(S.exportGlitchTimer); S.exportGlitchTimer = null; }
+  document.body.classList.remove('br-mode');
+  setOverlay('');
+  root.innerHTML = `<div style="min-height:100vh;background:#111;display:flex;align-items:center;justify-content:center;font-family:'Courier New',monospace">
+    <div style="color:#2a2a2a;max-width:420px;width:100%;padding:2rem">
+      <div style="font-size:.62rem;letter-spacing:.1em;margin-bottom:1.5rem;color:#1e1e1e">NEXUS DIAGNOSTIC CONSOLE v0.1 — INITIALIZING</div>
+      <div id="br-init-log" style="line-height:2.2;font-size:.78rem"></div>
+    </div>
+  </div>`;
+  const log = document.getElementById('br-init-log');
+  const lines = [
+    { t: '> connecting to export service…', c: '#2a2a2a' },
+    { t: '> connection established', c: '#2a2a2a' },
+    { t: '> fetching export manifest…', c: '#2a2a2a' },
+    { t: '> warning: manifest malformed', c: '#4a3030' },
+    { t: '> attempting repair…', c: '#2a2a2a' },
+    { t: '> repair failed', c: '#5a2a2a' },
+    { t: '> fallback mode: enabled', c: '#2a2a2a' },
+    { t: '> locating file system root…', c: '#2a2a2a' },
+    { t: '> root not found', c: '#444' },
+    { t: '> root not found', c: '#555' },
+    { t: '> root not found', c: '#666' },
+    { t: '> descending…', c: '#888' },
+  ];
+  let i = 0;
+  const iv = setInterval(() => {
+    if (!log || !log.isConnected) { clearInterval(iv); return; }
+    const el = document.createElement('div');
+    el.textContent = lines[i].t;
+    el.style.color = lines[i].c;
+    log.appendChild(el);
+    i++;
+    if (i >= lines.length) { clearInterval(iv); setTimeout(() => scene_backrooms(1), 700); }
+  }, 210);
+}
+
+function scene_backrooms(roomArg) {
+  incDepth();
+  S.brRoom = roomArg;
+  const slot = ((roomArg - 1) % 15) + 1;
+  const stage = slot <= 5 ? 1 : slot <= 10 ? 2 : 3;
+  const displayNum = (roomArg + Math.floor((roomArg - 1) / 15) * 4985).toString().padStart(5, '0');
+
+  document.body.classList.toggle('br-mode', stage >= 2);
+  setOverlay('');
+
+  const exitInput = stage >= 3 ? `
+    <div style="margin-top:3rem;padding-top:1.25rem;border-top:1px solid rgba(58,46,26,.15)">
+      <div style="font-size:.52em;letter-spacing:.1em;color:#9a8060;margin-bottom:.6rem">EMERGENCY EXIT PROTOCOL</div>
+      <input id="br-exit-input" type="text" autocomplete="off" style="background:rgba(58,46,26,.06);border:1px solid rgba(58,46,26,.2);color:#3a2e1a;padding:.35rem .6rem;font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.06em;width:150px" placeholder="access code">
+      <button onclick="(function(){var v=document.getElementById('br-exit-input').value.trim().toUpperCase();if(v==='LEVEL0'){scene_backrooms_exit();}else{var el=document.getElementById('br-exit-input');el.style.border='1px solid #8b3333';setTimeout(function(){el.style.border='1px solid rgba(58,46,26,.2)'},600);}})()" style="background:none;border:1px solid rgba(58,46,26,.25);color:#6a5040;padding:.35rem .75rem;font-family:'Courier New',monospace;font-size:.68rem;cursor:pointer;margin-left:.4rem">submit</button>
+    </div>` : '';
+
+  if (stage === 1) {
+    const navVariants = [
+      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
+      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">→ Next Room</button><button class="nav-link" data-go="backrooms_next">→ Next Room</button><button class="nav-link" data-go="backrooms_next">→ Next Room</button></div>`,
+      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
+      `<div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
+      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
+    ];
+    const contents = [
+      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
+       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
+       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.4rem">No errors found.</div>
+       <div style="font-size:.75rem;color:var(--g400);font-style:italic">(The room smells like wet carpet.)</div>
+       <div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
+
+      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
+       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
+       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.4rem">Pipeline status: nominal.</div>
+       <div style="font-size:.75rem;color:var(--g400)">No action required.</div>
+       <div style="margin-top:2rem;display:flex;gap:.75rem">
+         <button class="btn btn-primary" data-go="backrooms_next">Proceed →</button>
+         <button class="btn btn-primary" data-go="backrooms_next">Proceed →</button>
+       </div>`,
+
+      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
+       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
+       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.4rem">Pipeline status: nominal.</div>
+       <div style="font-size:.75rem;color:var(--g400)">No issues detected.</div>
+       <div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
+
+      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
+       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
+       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.75rem">Pipeline status: nominal.</div>
+       <div style="font-size:.8rem;color:var(--g400)">Free Trial — <strong style="color:var(--red)">14 days remaining</strong></div>
+       <div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
+
+      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
+       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
+       <div class="alert" style="font-size:.8rem;background:#f0fdf4;border-color:var(--green);margin-bottom:1rem">✓ All systems operational.</div>
+       <div style="font-size:.72rem;color:var(--g300);font-style:italic">Getting colder.</div>
+       <div style="margin-top:1.5rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
+    ];
+    root.innerHTML = `<div class="nav">${navVariants[slot - 1]}<div><span style="font-size:.8rem;color:var(--g400)">Free Trial — <strong style="color:var(--red)">14 days remaining</strong></span></div></div>
+    <div style="padding:2rem"><div style="max-width:500px">${contents[slot - 1]}</div></div>`;
+
+  } else if (stage === 2) {
+    const bgs = ['#f5f0e0','#ece3c8','#e4d8b0','#dace98','#d2c280'];
+    const bg = bgs[slot - 6];
+    const ls = (0.02 + (slot - 6) * 0.016).toFixed(3);
+    const stage2Contents = [
+      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
+       <div style="font-size:.9rem;color:#4a3a1a;margin-bottom:1rem;line-height:1.9">Pipeline fault detected.<br>Attempting recovery.</div>
+       <div style="font-size:.72rem;color:#7a6040;margin-bottom:2rem;line-height:1.9">Fault code: 0x${Math.abs(roomArg * 7 + S.depth).toString(16).toUpperCase().padStart(6,'0')}<br>Origin: unknown<br>Time elapsed: indeterminate</div>
+       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
+
+      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
+       <div style="font-size:.8rem;color:#4a3a1a;line-height:2.2;font-family:'Courier New',monospace;margin-bottom:1.25rem">
+         &gt; Ticket #${displayNum} opened automatically<br>
+         &gt; Analyzing issue…<br>
+         &gt; Ticket #${displayNum} resolved: <em style="color:#8b3333">you are not supposed to be here</em><br>
+         &gt; Closing ticket.
+       </div>
+       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
+
+      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
+       <div style="border:1px solid rgba(154,128,96,.35);padding:1rem;margin-bottom:1.25rem;font-size:.78rem;color:#6a5040;font-family:'Courier New',monospace;line-height:2">
+         <div style="font-size:.58rem;color:#9a8060;margin-bottom:.5rem">SUPPORT CHAT — CONNECTED</div>
+         <div><strong>Nexus Bot:</strong> Still looking into it…</div>
+         <div style="margin-top:.75rem;font-size:.58rem;color:#9a8060">Message sent at an unknown time &nbsp;·&nbsp; No agents available</div>
+       </div>
+       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
+
+      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
+       <div style="font-size:.88rem;color:#4a3a1a;margin-bottom:1.25rem;line-height:2.1">P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp;—<br>P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp;—<br>P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp; t e r m s</div>
+       <div style="display:flex;justify-content:space-between;align-items:flex-end">
+         <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ R e c e d e ]</button>
+         <div>
+           <button style="padding:.55rem 1.4rem;background:none;border:1px solid rgba(154,128,96,.3);color:rgba(74,58,26,.3);font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ C o n t i n u e ]</button>
+           <div style="font-size:.55rem;color:#9a8060;text-align:right;margin-top:.3rem">(goes forward)</div>
+         </div>
+       </div>`,
+
+      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
+       <div style="font-size:.88rem;color:#4a3a1a;margin-bottom:.85rem;line-height:2">Something moved.<br><br>In your peripheral vision.<br>It was probably nothing.</div>
+       <div style="font-size:.58rem;color:#9a8060;font-style:italic;margin-bottom:1.5rem">There are no windows in this room. There are no doors in this room. There is a button.</div>
+       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
+    ];
+    root.innerHTML = `<div style="min-height:100vh;background:${bg};display:flex;align-items:center;justify-content:center;padding:2.5rem;font-family:'Courier New',monospace;letter-spacing:${ls}em">
+      <div style="max-width:540px;width:100%">${stage2Contents[slot - 6]}</div>
+    </div>`;
+
+  } else {
+    const stage3Contents = [
+      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
+       <div style="font-size:.82em;color:#3a2e1a;line-height:2.2;margin-bottom:1.75rem">you have been here before.<br>you will be here again.<br><br>there is no other direction.</div>
+       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
+
+      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
+       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:1.75rem">
+         the export is ${Math.round(roomArg * 0.0009)}% complete.<br>
+         the export is ${Math.round(roomArg * 0.0009)}% complete.<br>
+         the export is ${Math.round(roomArg * 0.0009)}% complete.<br>
+         <span style="color:#8b3333">the export will never complete.</span>
+       </div>
+       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
+
+      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
+       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:1.75rem">
+         there is something in this room with you.<br>
+         it has always been here.<br>
+         it was here before you arrived.<br><br>
+         <span style="color:#9a8060;font-size:.88em">it is not looking at you.</span><br>
+         <span style="color:#9a8060;font-size:.88em">it does not need to.</span>
+       </div>
+       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
+
+      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
+       <div style="font-size:.82em;color:#3a2e1a;line-height:2.4;margin-bottom:1.75rem">
+         d&#x336;o&#x336;n&#x336;'&#x336;t&#x336;<br>
+         s&#x336;t&#x336;o&#x336;p&#x336;.<br>
+         d&#x336;o&#x336;n&#x336;'&#x336;t&#x336;&nbsp;&nbsp;s&#x336;t&#x336;o&#x336;p&#x336;.<br>
+         <span style="color:#9a8060;font-size:.78em">you stopped. you are still stopping.</span>
+       </div>
+       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
+
+      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
+       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:.5rem">there is a door on Level 2.</div>
+       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:1.75rem">the code is <span style="background:#3a2e1a;color:#3a2e1a;padding:0 .4rem;user-select:none;cursor:default" title="[redacted]">LEVEL0</span>.</div>
+       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
+    ];
+    root.innerHTML = `<div style="min-height:100vh;background:#d4b483;display:flex;align-items:center;justify-content:center;padding:2.5rem;font-family:'Courier New',monospace;letter-spacing:.15em;animation:br-flicker 8s infinite">
+      <div style="max-width:480px;width:100%">
+        ${stage3Contents[slot - 11]}
+        ${exitInput}
+      </div>
+    </div>`;
+  }
+}
+
+function scene_backrooms_next() {
+  scene_backrooms(S.brRoom + 1);
+}
+
+function scene_backrooms_exit() {
+  document.body.classList.remove('br-mode');
+  S.exportRequested = false;
+  setOverlay('');
+  toast('📦 Export complete. 1 file downloaded.');
+  setTimeout(() => scene_dashboard(), 800);
+}
+
 // ────────────── ROUTER ──────────────
 
 const SCENES = {
@@ -6116,6 +6366,8 @@ const SCENES = {
   session_reverify: scene_session_reverify,
   data_export: scene_data_export,
   export_request: scene_export_request,
+  backrooms_next: scene_backrooms_next,
+  backrooms_exit: scene_backrooms_exit,
   mobile_prompt: scene_mobile_prompt,
   mobile_download: scene_mobile_download,
   changelog: scene_changelog,
