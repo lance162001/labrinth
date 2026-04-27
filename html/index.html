@@ -6701,156 +6701,24 @@ function scene_backrooms_enter() {
 function scene_backrooms(roomArg) {
   incDepth();
   S.brRoom = roomArg;
-  const slot = ((roomArg - 1) % 15) + 1;
-  const stage = slot <= 5 ? 1 : slot <= 10 ? 2 : 3;
-  const displayNum = (roomArg + Math.floor((roomArg - 1) / 15) * 4985).toString().padStart(5, '0');
+  const slot = ((roomArg - 1) % 100) + 1;
+  const stage = slot <= 25 ? 1 : slot <= 50 ? 2 : slot <= 75 ? 3 : 4;
+  const displayNum = (roomArg + Math.floor((roomArg - 1) / 100) * 950000).toString().padStart(5, '0');
 
   document.body.classList.toggle('br-mode', stage >= 2);
+  document.body.classList.toggle('br-deep', stage >= 4);
   setOverlay('');
 
-  const exitInput = stage >= 3 ? `
-    <div style="margin-top:3rem;padding-top:1.25rem;border-top:1px solid rgba(58,46,26,.15)">
-      <div style="font-size:.52em;letter-spacing:.1em;color:#9a8060;margin-bottom:.6rem">EMERGENCY EXIT PROTOCOL</div>
-      <input id="br-exit-input" type="text" autocomplete="off" style="background:rgba(58,46,26,.06);border:1px solid rgba(58,46,26,.2);color:#3a2e1a;padding:.35rem .6rem;font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.06em;width:150px" placeholder="access code">
-      <button onclick="(function(){var v=document.getElementById('br-exit-input').value.trim().toUpperCase();if(v==='LEVEL0'){scene_backrooms_exit();}else{var el=document.getElementById('br-exit-input');el.style.border='1px solid #8b3333';setTimeout(function(){el.style.border='1px solid rgba(58,46,26,.2)'},600);}})()" style="background:none;border:1px solid rgba(58,46,26,.25);color:#6a5040;padding:.35rem .75rem;font-family:'Courier New',monospace;font-size:.68rem;cursor:pointer;margin-left:.4rem">submit</button>
-    </div>` : '';
+  brBuildUrl(stage, slot, roomArg);
 
   if (stage === 1) {
-    const navVariants = [
-      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
-      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">→ Next Room</button><button class="nav-link" data-go="backrooms_next">→ Next Room</button><button class="nav-link" data-go="backrooms_next">→ Next Room</button></div>`,
-      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
-      `<div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
-      `<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>`,
-    ];
-    const contents = [
-      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
-       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
-       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.4rem">No errors found.</div>
-       <div style="font-size:.75rem;color:var(--g400);font-style:italic">(The room smells like wet carpet.)</div>
-       <div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
-
-      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
-       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
-       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.4rem">Pipeline status: nominal.</div>
-       <div style="font-size:.75rem;color:var(--g400)">No action required.</div>
-       <div style="margin-top:2rem;display:flex;gap:.75rem">
-         <button class="btn btn-primary" data-go="backrooms_next">Proceed →</button>
-         <button class="btn btn-primary" data-go="backrooms_next">Proceed →</button>
-       </div>`,
-
-      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
-       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
-       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.4rem">Pipeline status: nominal.</div>
-       <div style="font-size:.75rem;color:var(--g400)">No issues detected.</div>
-       <div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
-
-      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
-       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
-       <div style="font-size:.875rem;color:var(--g600);margin-bottom:.75rem">Pipeline status: nominal.</div>
-       <div style="font-size:.8rem;color:var(--g400)">Free Trial — <strong style="color:var(--red)">14 days remaining</strong></div>
-       <div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
-
-      `<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>
-       <div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ${displayNum}.</div>
-       <div class="alert" style="font-size:.8rem;background:#f0fdf4;border-color:var(--green);margin-bottom:1rem">✓ All systems operational.</div>
-       <div style="font-size:.72rem;color:var(--g300);font-style:italic">Getting colder.</div>
-       <div style="margin-top:1.5rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>`,
-    ];
-    root.innerHTML = `<div class="nav">${navVariants[slot - 1]}<div><span style="font-size:.8rem;color:var(--g400)">Free Trial — <strong style="color:var(--red)">14 days remaining</strong></span></div></div>
-    <div style="padding:2rem"><div style="max-width:500px">${contents[slot - 1]}</div></div>`;
-
+    root.innerHTML = brStage1(slot, displayNum, roomArg);
   } else if (stage === 2) {
-    const bgs = ['#f5f0e0','#ece3c8','#e4d8b0','#dace98','#d2c280'];
-    const bg = bgs[slot - 6];
-    const ls = (0.02 + (slot - 6) * 0.016).toFixed(3);
-    const stage2Contents = [
-      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
-       <div style="font-size:.9rem;color:#4a3a1a;margin-bottom:1rem;line-height:1.9">Pipeline fault detected.<br>Attempting recovery.</div>
-       <div style="font-size:.72rem;color:#7a6040;margin-bottom:2rem;line-height:1.9">Fault code: 0x${Math.abs(roomArg * 7 + S.depth).toString(16).toUpperCase().padStart(6,'0')}<br>Origin: unknown<br>Time elapsed: indeterminate</div>
-       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
-
-      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
-       <div style="font-size:.8rem;color:#4a3a1a;line-height:2.2;font-family:'Courier New',monospace;margin-bottom:1.25rem">
-         &gt; Ticket #${displayNum} opened automatically<br>
-         &gt; Analyzing issue…<br>
-         &gt; Ticket #${displayNum} resolved: <em style="color:#8b3333">you are not supposed to be here</em><br>
-         &gt; Closing ticket.
-       </div>
-       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
-
-      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
-       <div style="border:1px solid rgba(154,128,96,.35);padding:1rem;margin-bottom:1.25rem;font-size:.78rem;color:#6a5040;font-family:'Courier New',monospace;line-height:2">
-         <div style="font-size:.58rem;color:#9a8060;margin-bottom:.5rem">SUPPORT CHAT — CONNECTED</div>
-         <div><strong>Nexus Bot:</strong> Still looking into it…</div>
-         <div style="margin-top:.75rem;font-size:.58rem;color:#9a8060">Message sent at an unknown time &nbsp;·&nbsp; No agents available</div>
-       </div>
-       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
-
-      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
-       <div style="font-size:.88rem;color:#4a3a1a;margin-bottom:1.25rem;line-height:2.1">P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp;—<br>P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp;—<br>P l e a s e &nbsp; r e a d &nbsp; t h e &nbsp; t e r m s</div>
-       <div style="display:flex;justify-content:space-between;align-items:flex-end">
-         <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ R e c e d e ]</button>
-         <div>
-           <button style="padding:.55rem 1.4rem;background:none;border:1px solid rgba(154,128,96,.3);color:rgba(74,58,26,.3);font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">[ C o n t i n u e ]</button>
-           <div style="font-size:.55rem;color:#9a8060;text-align:right;margin-top:.3rem">(goes forward)</div>
-         </div>
-       </div>`,
-
-      `<div style="font-size:.58rem;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.1em">NEXUS — DIAGNOSTIC CONSOLE — ROOM ${displayNum}</div>
-       <div style="font-size:.88rem;color:#4a3a1a;margin-bottom:.85rem;line-height:2">Something moved.<br><br>In your peripheral vision.<br>It was probably nothing.</div>
-       <div style="font-size:.58rem;color:#9a8060;font-style:italic;margin-bottom:1.5rem">There are no windows in this room. There are no doors in this room. There is a button.</div>
-       <button style="padding:.55rem 1.4rem;background:none;border:1px solid #9a8060;color:#4a3a1a;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>`,
-    ];
-    root.innerHTML = `<div style="min-height:100vh;background:${bg};display:flex;align-items:center;justify-content:center;padding:2.5rem;font-family:'Courier New',monospace;letter-spacing:${ls}em">
-      <div style="max-width:540px;width:100%">${stage2Contents[slot - 6]}</div>
-    </div>`;
-
+    root.innerHTML = brStage2(slot, displayNum, roomArg);
+  } else if (stage === 3) {
+    root.innerHTML = brStage3(slot, displayNum, roomArg);
   } else {
-    const stage3Contents = [
-      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
-       <div style="font-size:.82em;color:#3a2e1a;line-height:2.2;margin-bottom:1.75rem">you have been here before.<br>you will be here again.<br><br>there is no other direction.</div>
-       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
-
-      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
-       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:1.75rem">
-         the export is ${Math.round(roomArg * 0.0009)}% complete.<br>
-         the export is ${Math.round(roomArg * 0.0009)}% complete.<br>
-         the export is ${Math.round(roomArg * 0.0009)}% complete.<br>
-         <span style="color:#8b3333">the export will never complete.</span>
-       </div>
-       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
-
-      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
-       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:1.75rem">
-         there is something in this room with you.<br>
-         it has always been here.<br>
-         it was here before you arrived.<br><br>
-         <span style="color:#9a8060;font-size:.88em">it is not looking at you.</span><br>
-         <span style="color:#9a8060;font-size:.88em">it does not need to.</span>
-       </div>
-       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
-
-      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
-       <div style="font-size:.82em;color:#3a2e1a;line-height:2.4;margin-bottom:1.75rem">
-         d&#x336;o&#x336;n&#x336;'&#x336;t&#x336;<br>
-         s&#x336;t&#x336;o&#x336;p&#x336;.<br>
-         d&#x336;o&#x336;n&#x336;'&#x336;t&#x336;&nbsp;&nbsp;s&#x336;t&#x336;o&#x336;p&#x336;.<br>
-         <span style="color:#9a8060;font-size:.78em">you stopped. you are still stopping.</span>
-       </div>
-       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
-
-      `<div style="font-size:.52em;color:#9a8060;margin-bottom:1.5rem;letter-spacing:.12em">ROOM ${displayNum}</div>
-       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:.5rem">there is a door on Level 2.</div>
-       <div style="font-size:.78em;color:#5a4a2a;line-height:2.2;margin-bottom:1.75rem">the code is <span style="background:#3a2e1a;color:#3a2e1a;padding:0 .4rem;user-select:none;cursor:default" title="[redacted]">LEVEL0</span>.</div>
-       <button style="padding:.55rem 1.25rem;background:none;border:1px solid rgba(58,46,26,.3);color:#3a2e1a;font-family:'Courier New',monospace;font-size:.78rem;cursor:pointer;border-radius:0" data-go="backrooms_next">keep going</button>`,
-    ];
-    root.innerHTML = `<div style="min-height:100vh;background:#d4b483;display:flex;align-items:center;justify-content:center;padding:2.5rem;font-family:'Courier New',monospace;letter-spacing:.15em;animation:br-flicker 8s infinite">
-      <div style="max-width:480px;width:100%">
-        ${stage3Contents[slot - 11]}
-        ${exitInput}
-      </div>
-    </div>`;
+    root.innerHTML = brStage4(slot, displayNum, roomArg);
   }
 }
 
