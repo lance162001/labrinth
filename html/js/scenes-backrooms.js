@@ -588,6 +588,8 @@ function brStage4(slot, displayNum, roomArg) {
 function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
+  markNarratorMilestone('backrooms', 'br_enter');
+  narratorEnter('backrooms_enter');
   S.brRoom = 0;
   S.brUrlPath = '';
   if (S.exportGlitchTimer) { clearTimeout(S.exportGlitchTimer); S.exportGlitchTimer = null; }
@@ -642,6 +644,15 @@ function scene_backrooms(roomArg) {
   S.brRoom = roomArg;
   const slot = ((roomArg - 1) % 100) + 1;
   const stage = slot <= 25 ? 1 : slot <= 50 ? 2 : slot <= 75 ? 3 : 4;
+
+  const _brT = {1:'br_s1',10:'br_s1_mid',26:'br_s2',35:'br_s2_mid',
+                51:'br_s3',60:'br_s3_mid',76:'br_s4',85:'br_s4_mid',100:'br_s4_end'};
+  if (_brT[slot]) markNarratorMilestone('backrooms', _brT[slot]);
+  if (slot === 26) narratorEnter('backrooms_stage2');
+  if (slot === 51) narratorEnter('backrooms_stage3');
+  if (slot === 76) narratorEnter('backrooms_stage4');
+  if (slot === 85) narratorEnter('backrooms_deep');
+
   const displayNum = (roomArg + Math.floor((roomArg - 1) / 100) * 950000).toString().padStart(5, '0');
 
   document.body.classList.toggle('br-mode', stage >= 2);
@@ -698,6 +709,7 @@ function scene_backrooms_next() {
 }
 
 function scene_backrooms_exit() {
+  markNarratorMilestone('backrooms', 'br_exit');
   document.body.classList.remove('br-mode', 'br-deep', 'br-fc-1', 'br-fc-2', 'br-fc-3');
   document.body.style.filter = '';
   document.title = 'Nexus';
