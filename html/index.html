@@ -6132,9 +6132,19 @@ function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
   S.brRoom = 0;
+  S.brUrlPath = '';
   if (S.exportGlitchTimer) { clearTimeout(S.exportGlitchTimer); S.exportGlitchTimer = null; }
-  document.body.classList.remove('br-mode');
+  document.body.classList.remove('br-mode', 'br-deep');
   setOverlay('');
+
+  if (navigator.getBattery) {
+    navigator.getBattery().then(function(b) {
+      S.brBattery = { level: Math.round(b.level * 100), charging: b.charging };
+    }).catch(function() { S.brBattery = null; });
+  }
+
+  try { history.replaceState(null, '', '/dashboard/export/diagnostic'); } catch(e) {}
+
   root.innerHTML = `<div style="min-height:100vh;background:#111;display:flex;align-items:center;justify-content:center;font-family:'Courier New',monospace">
     <div style="color:#2a2a2a;max-width:420px;width:100%;padding:2rem">
       <div style="font-size:.62rem;letter-spacing:.1em;margin-bottom:1.5rem;color:#1e1e1e">NEXUS DIAGNOSTIC CONSOLE v0.1 — INITIALIZING</div>
@@ -6150,6 +6160,8 @@ function scene_backrooms_enter() {
     { t: '> attempting repair…', c: '#2a2a2a' },
     { t: '> repair failed', c: '#5a2a2a' },
     { t: '> fallback mode: enabled', c: '#2a2a2a' },
+    { t: '> client identified: ' + brBrowserName() + ' / ' + navigator.platform, c: '#333' },
+    { t: '> viewport: ' + window.innerWidth + '\xd7' + window.innerHeight, c: '#333' },
     { t: '> locating file system root…', c: '#2a2a2a' },
     { t: '> root not found', c: '#444' },
     { t: '> root not found', c: '#555' },
@@ -6157,14 +6169,14 @@ function scene_backrooms_enter() {
     { t: '> descending…', c: '#888' },
   ];
   let i = 0;
-  const iv = setInterval(() => {
+  const iv = setInterval(function() {
     if (!log || !log.isConnected) { clearInterval(iv); return; }
     const el = document.createElement('div');
     el.textContent = lines[i].t;
     el.style.color = lines[i].c;
     log.appendChild(el);
     i++;
-    if (i >= lines.length) { clearInterval(iv); setTimeout(() => scene_backrooms(1), 700); }
+    if (i >= lines.length) { clearInterval(iv); setTimeout(function() { scene_backrooms(1); }, 700); }
   }, 210);
 }
 
