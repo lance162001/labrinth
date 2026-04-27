@@ -6088,6 +6088,46 @@ function brFaultCode(roomArg) {
   return '0x' + brHex(roomArg * 7 + S.depth);
 }
 
+const BR_URL_S1_SEGS = ['repair','manifest','fallback','session','cache','warmup','trace','handshake'];
+const BR_URL_S4_SUFFIXES = ['no_return','null_route','dropped','undefined','orphan_2','unreachable','blackhole','stale'];
+
+function brBuildUrl(stage, slot, roomArg) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const region = brTimezoneRegion();
+  const lang = navigator.language;
+  const hex4 = brHex(roomArg, 4);
+  const faultHex = brHex(roomArg * 3 + slot, 6);
+
+  if (stage === 1) {
+    const seg = BR_URL_S1_SEGS[slot % BR_URL_S1_SEGS.length];
+    if (!S.brUrlPath) S.brUrlPath = `/dashboard/export/diagnostic/session/${seg}`;
+    else S.brUrlPath += `/${seg}`;
+  } else if (stage === 2) {
+    const layer = (slot % 3) + 2;
+    if (!S.brUrlPath) S.brUrlPath = `/cdn-edge/${region}/cache/layer${layer}/0x${faultHex}/timeout`;
+    else S.brUrlPath += `/retry/${faultHex.slice(0, 4)}`;
+  } else if (stage === 3) {
+    const durHex = brHex(Math.floor(performance.now()), 6);
+    if (!S.brUrlPath) S.brUrlPath = `/internal/session/${durHex}/log/entry/${roomArg}/user/trace/${lang}/undefined`;
+    else S.brUrlPath += `/orphan/${durHex.slice(0, 4)}`;
+  } else {
+    const cores = navigator.hardwareConcurrency || 4;
+    const depth = screen.colorDepth || 24;
+    const suffix = BR_URL_S4_SUFFIXES[roomArg % BR_URL_S4_SUFFIXES.length];
+    if (!S.brUrlPath) S.brUrlPath = `/proc/net/tcp6/${vw.toString(16).padStart(4,'0')}:${vh.toString(16).padStart(4,'0')}/0x${hex4}/${cores}core/${depth}bit/orphan/${suffix}`;
+    else S.brUrlPath += `/${suffix}`;
+  }
+
+  // Cap at ~400 chars: keep first 3 segments + last 8 segments
+  if (S.brUrlPath.length > 400) {
+    const parts = S.brUrlPath.split('/').filter(Boolean);
+    S.brUrlPath = '/' + [...parts.slice(0, 3), '...', ...parts.slice(-8)].join('/');
+  }
+
+  try { history.replaceState(null, '', S.brUrlPath); } catch(e) {}
+}
+
 function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
