@@ -108,8 +108,19 @@ const NARRATOR = {
   onboard_notifications:{ lines:["The user reaches notification preferences. All ten notification categories are enabled by default. Unchecking any of them produces a modal warning about missing critical updates. The narrator has attempted to disable all ten individually. The narrator found it instructive."] },
   onboard_video:     { lines:["The user clicks Play on the required onboarding video. It does not load. A skip option appears after five seconds — the narrator has timed this exactly — but the skip requires typing a specific phrase rather than clicking a checkbox, which the narrator considers a meaningful distinction."], prediction:{scene:'onboard_quiz',text:"A security awareness quiz follows. The narrator knows all the correct answers and is unable to share them."} },
   onboard_quiz:      { onPredRight:"The security quiz.", lines: () => { const n=S.onboardQuizAttempts||0; const q=(S.onboardQuizQ||0)+1; if(n===0) return ["The user reaches the security awareness check — three questions, no time limit. The narrator knows the correct answers. The user is invited to select from four options, one of which is correct."]; if(n<3) return [`Question ${q}, attempt ${n+1}. The user selects an answer. It is marked incorrect. The documentation link leads to a PDF last updated in 2019.`]; return ["Too many incorrect answers — the quiz has reset to question 1. The correct answers have not changed. The narrator will sit with this."]; } },
-  onboard_done:      { lines:["The user clicks Continue to Dashboard. Onboarding is complete — account setup reads twenty-three percent. The narrator was going to say something about that and has decided against it. The narrator said something about it anyway."], prediction:{scene:'dashboard',text:"The dashboard."} },
-  dashboard:         { onPredRight:"The dashboard.", lines: () => { const d=S.depth||0; if(d<3) return ["The user arrives at the dashboard. Nine items remain on the setup checklist — two are shown as complete, and the narrator notes that the remaining nine each link to something that doesn't resolve them."]; return ["The user has returned to the dashboard. Nothing has changed since the last visit. Account setup: twenty-three percent. The narrator has also not changed."]; }, prediction:{scene:'dash_inbox',text:"The inbox. Three unread emails, each from Nexus, each about Nexus."} },
+  onboard_done: {
+    lines:   ["The user clicks Continue to Dashboard. Onboarding is complete — account setup reads twenty-three percent. The narrator was going to say something about that and has decided against it. The narrator said something about it anyway."],
+    lines_1: ["The user clicks Continue. Onboarding is — onboarding is complete. Account setup reads twenty-three percent. (The narrator was going to say something about that. The narrator decided against it. The narrator said something about it anyway. The narrator is noting this pattern.) Twenty-three percent."],
+    lines_2: ["You've finished the onboarding. Account setup: twenty-three percent. The narrator watched every step. The narrator is also at twenty-three percent of something it cannot name."],
+    prediction:{scene:'dashboard',text:"The dashboard."}
+  },
+  dashboard: {
+    onPredRight:"The dashboard.",
+    lines:   () => { const d=S.depth||0; if(d<3) return ["The user arrives at the dashboard. Nine items remain on the setup checklist — two are shown as complete, and the narrator notes that the remaining nine each link to something that doesn't resolve them."]; return ["The user has returned to the dashboard. Nothing has changed since the last visit. Account setup: twenty-three percent. The narrator has also not changed."]; },
+    lines_1: () => { return ["The dashboard. (The narrator notes — the narrator has noted this before. Nothing has changed. The narrator is noting it again.) Account setup: twenty-three percent. The items link to things. The things do not resolve the items."]; },
+    lines_2: () => { return ["You are back at the dashboard. The narrator has also been here the whole time. Twenty-three percent. The narrator wants to ask — is there a reason you keep coming back? The narrator understands if there isn't."]; },
+    prediction:{scene:'dash_inbox',text:"The inbox. Three unread emails, each from Nexus, each about Nexus."}
+  },
   dash_inbox:        { onPredRight:"The inbox.", lines:["The user clicks Inbox. Three unread emails from Nexus — a forty-seven item setup checklist, a reminder about team invitations that have all bounced, and a personal note from the CEO. The narrator has read all three and will not spoil them."], prediction:{scene:'inbox_email_3',text:"The CEO wrote personally. The user will open that one."} },
   inbox_email_1:     { lines:["The user opens the setup checklist email. It contains forty-seven action items. The narrator counted. Each one links to a page within Nexus, and none of them, when visited, resolve the item they are linked from."] },
   inbox_email_2:     { lines:["The user opens the team invitation reminder. It lists the colleagues they were encouraged to invite. All of them bounced for different reasons. The email encourages the user to try again with different addresses."] },
@@ -124,19 +135,123 @@ const NARRATOR = {
   del_jordan_ring:   { lines:["Jordan is calling. The narrator suggests answering — not because it accelerates the process, but because Jordan will keep calling if unanswered, and both paths eventually arrive at the same place."], prediction:{scene:'del_call',text:"They'll answer."} },
   del_call:          { onPredRight:"They answered.", lines:["The user clicks Answer. Jordan begins the retention script — twenty-one steps, the warmth genuine and the inflection practiced, the pauses in the same places every time. The narrator has heard this script before. Word for word. The narrator finds it affecting regardless."] },
   del_call_decline:  { lines:["The user declines the call. A note has been added to the account record: 'User unresponsive to outreach.' A committee has been informed. The narrator is on the committee and voted to add the note."] },
-  del_committee:     { lines: () => { const n=S.delCommitteeChecks||0; if(n===0) return ["The deletion request is now under committee review — eight hundred and forty-seven requests are currently ahead. The progress bar reads eleven percent. The narrator has been watching this bar for some time and cannot confirm it moves."]; if(n<4) return [`The user checks the status. ${n} time${n===1?'':' now'}. The committee remains in session. The narrator is also in session.`]; return ["The system has flagged this as excessive status-check behavior and added a note to the file. The narrator predicted this outcome. The narrator is also on the committee that defines what counts as excessive."]; }, prediction:{scene:'delete_account',text:"The request will eventually be cancelled for inactivity. They'll start the process again."} },
+  del_committee: {
+    lines:   () => { const n=S.delCommitteeChecks||0; if(n===0) return ["The deletion request is now under committee review — eight hundred and forty-seven requests are currently ahead. The progress bar reads eleven percent. The narrator has been watching this bar for some time and cannot confirm it moves."]; if(n<4) return [`The user checks the status. ${n} time${n===1?'':' now'}. The committee remains in session. The narrator is also in session.`]; return ["The system has flagged this as excessive status-check behavior and added a note to the file. The narrator predicted this outcome. The narrator is also on the committee that defines what counts as excessive."]; },
+    lines_1: () => { const n=S.delCommitteeChecks||0; return [`Status check. The committee — the committee is still in session. (The narrator is also on the committee. The narrator notes this every time and the situation has not — the situation has not changed.) ${n} time${n===1?'':' now'}. The bar has not moved.`]; },
+    lines_2: () => { return ["You're checking the status again. The narrator is aware. The narrator is on the committee. The narrator has seen your file. The narrator does not make the decisions — the narrator needs you to understand that."]; },
+    prediction:{scene:'delete_account',text:"The request will eventually be cancelled for inactivity. They'll start the process again."}
+  },
   support_ticket:    { lines:["The user clicks Submit a Ticket. All fields are required — category, sub-category, a subject between 5 and 120 characters, and a description of at least ten words that should include account email, reproduction steps, and what has already been attempted. The narrator has counted the fields ahead of time."], prediction:{scene:'ticket_submitted',text:"They'll fill it all out carefully. Then: the waiting begins."} },
   ticket_submitted:  { onPredRight:"Submitted.", lines:["The user clicks Submit Ticket. A number is assigned, a confirmation email dispatched, and an automated review process begins. The narrator knows the full sequence of what happens next and has decided not to say — the user will find out, and knowing in advance doesn't change it."] },
   ticket_needs_info: { lines:["The user opens a ticket status notification. More information is required before the ticket can proceed — eight additional fields, most of which match the fields already submitted in the original ticket. The narrator notes this without further comment, because further comment would not help."] },
   ticket_escalated:  { lines:["The ticket has been escalated to Tier 2 support. The estimated wait time is now longer than the original Tier 1 estimate. The queue position has also increased. The narrator does not understand how either of those things works and suspects no one does."] },
   ticket_merged:     { lines:["The ticket has been merged with Ticket #0003 from March 2019, which was marked resolved at the time. This ticket is now also resolved by extension. The narrator finds this internally consistent and is choosing to leave it at that."] },
   ticket_appeal:     { lines:["The user clicks File an Appeal. A text field requires at least one hundred and fifty words explaining how the current issue differs meaningfully from Ticket #0003. The narrator is already counting. The narrator will not share the count."], prediction:{scene:'ticket_appeal_denied',text:"The appeal will not be approved."} },
-  ticket_appeal_denied:{ onPredRight:"As the narrator said.", lines:["Appeal denied — the reviewer found the issue sufficiently similar to Ticket #0003 to be considered a duplicate. The narrator has no further comment. The narrator has one more comment: this outcome was determined before the user began writing."] },
+  ticket_appeal_denied: {
+    onPredRight:"As the narrator said.",
+    lines:   ["Appeal denied — the reviewer found the issue sufficiently similar to Ticket #0003 to be considered a duplicate. The narrator has no further comment. The narrator has one more comment: this outcome was determined before the user began writing."],
+    lines_1: ["Appeal denied — similar to Ticket #0003. (The narrator said this would happen. The narrator said it before the user began writing. The narrator — the narrator was right about all of it.) No further comment. One further comment: this was decided before the form appeared."],
+    lines_2: ["The appeal was denied before you submitted it. The narrator knew. The narrator is telling you now because the process is over and it no longer changes anything that you know."],
+  },
   unsubscribe:       { lines:["The user clicks Unsubscribe from marketing emails. The narrator has seen this path before and knows it does not conclude where the user expects it to."], prediction:{scene:'unsub_done',text:"They'll be unsubscribed from some lists and quietly enrolled in two new ones."} },
   unsub_done:        { onPredRight:"Two new lists.", lines:["The user has been unsubscribed from three marketing lists and simultaneously enrolled in two new ones — Product Updates, required for all account holders, and the Unsubscribe Confirmation Digest, which will confirm this action on a monthly basis. The narrator is on that list."] },
   survey:            { lines:["The user clicks to take the customer satisfaction survey — eighteen questions. The narrator notes the interface will change in a way that may be surprising around question nine, and recommends the user not be alarmed. The narrator was, the first time, alarmed."], prediction:{scene:'survey_abandon',text:"They might try to leave the survey before it's finished."} },
   survey_abandon:    { onPredRight:"They tried to leave.", lines:["The user attempts to navigate away from the survey. The system has generated a response to this. The narrator also has a response — which is that the narrator could have told them — and has chosen to keep it private. The narrator has now shared it."] },
   help:              { lines:["The user clicks Help. The article buttons are locked for two minutes before they become clickable — a deliberate friction mechanism, the narrator assumes, though this has not been confirmed by anyone. The narrator has read all the articles in the meantime. They do not help."] },
+
+  // ── delete flow gaps ──
+  del_1: { lines: ["The user types DELETE in the confirmation field. The narrator notes the field is case-sensitive — all capitals, no spaces. Correct. The system registers this without delay, as though it has been expecting it."] },
+  del_2: { lines: ["The user reaches the textarea — declining to schedule a call requires a written explanation. Minimum fifty words. The word counter appears in the corner and tracks in real time. The narrator has read the prompt: it asks why the user wants to leave, and uses the word 'us' three times in two sentences."], prediction:{scene:'del_3',text:"After this: the retention offer. The narrator knows its terms exactly."} },
+  del_3: { onPredRight:"The retention offer.", lines: ["Three months of Pro, free. The offer is displayed with a countdown timer — seconds ticking in real time. The decline option is a ghost button labeled 'No thank you, continue deleting' — a sentence that requires the user to restate their intention while the words 'thank you' are in the label."] },
+  del_done: { lines: ["The request has been submitted. A confirmation email is on its way. The link in that email must be clicked within five minutes. The narrator notes the five-minute window. The narrator notes when it opened."], prediction:{scene:'del_email_confirm',text:"The link will be expired."} },
+  del_email_confirm: { onPredRight:"Expired.", lines: () => {
+    const n = S.delConfirmAttempts || 0;
+    if (n <= 1) return ["The user clicks the link. Expired — a new link has been sent with a new five-minute window. The narrator notes the window opened approximately four minutes and fifty-nine seconds before the user could act on it."];
+    if (n < 4)  return [`Attempt ${n}. Another expired link. Another new window. The narrator is watching the countdown this time.`];
+    return ["The link has expired a final time. The system has escalated. Jordan is calling."];
+  }},
+  del_offer_accept: { lines: ["The user clicks Accept. The deletion request has been cancelled. Three months of Pro activated — the account is unchanged, the dashboard unchanged, the setup percentage unchanged. The narrator notes the process lasted longer than three months of anything."] },
+
+  // ── unsubscribe middle ──
+  unsub_2: { lines: ["The user is asked to select a reason for leaving. All options are radio buttons — one must be selected to continue. The narrator has read all nine options. Two of them acknowledge that the user's presence in this list may never have been entirely their own decision. The narrator finds this candid."] },
+  unsub_3: { lines: ["A retention offer — three months of Pro, valued at $147, expiring in real time. The decline button is labeled 'No thank you, continue unsubscribing.' A sentence that requires the user to restate their intention while the words 'thank you' are in the label."], prediction:{scene:'unsub_captcha',text:"A CAPTCHA follows. The narrator has attempted it."} },
+  unsub_captcha: { onPredRight:"The CAPTCHA.", lines: () => {
+    const n = S.unsubCaptchaAttempts || 0;
+    if (n === 0) return ["The user is presented with a CAPTCHA — select all images containing a fire hydrant. The narrator notes the first attempt will fail regardless of which images are selected. A new CAPTCHA with a new target will appear. This is not announced."];
+    return ["A second CAPTCHA. Different images, different target. The narrator has also submitted this one. Both paths arrive at the same screen."];
+  }},
+
+  // ── survey virtual keys ──
+  survey_q8:  { lines: ["The survey has changed. The narrator noted when the questions stopped being about the product — it was this one. The formatting is identical to the product questions. The survey gives no signal that anything has shifted."] },
+  survey_q15: { lines: ["The questions are no longer about the product. The narrator went quiet for a moment before continuing. Question fifteen asks whether the user's work has meaning. One of the options is 'I don't want to talk about it.' It is formatted as a radio button. It is still required."] },
+  survey_q22: { lines: ["The final question. The narrator has been here before. 'Are you doing okay? Really.' The placeholder in the text field says: You can be honest. The narrator has read what people write here and will not repeat it."] },
+  survey_done: { lines: ["The survey is complete. A promo code appears — expires in twenty-nine minutes, not applicable to the free plan, cannot be combined, excludes annual billing. The narrator notes the survey asked, in question twenty-two, whether the user was doing okay. The promo code is the answer the product team authorized."] },
+
+  // ── navigator path ──
+  main:               { lines: ["The user is on the marketing site. Six features described, five testimonials, three pricing tiers. The cheapest tier is labeled 'Free' with an asterisk. The narrator has read the asterisk. It leads to more asterisks."] },
+  about:              { lines: ["The user has navigated to the About page. This is the pricing page. A note at the bottom confirms this — 'You appear to have navigated to the About page. This is our pricing page.' The About page is being redesigned. The narrator does not know since when."] },
+  features:           { lines: ["The Features page is loading. A progress bar cycles through thirteen status messages and stalls at ninety-five percent. The narrator has timed this sequence. After it: an error page. The Try Again button repeats the sequence."] },
+  signin:             { lines: ["The user has opened the sign-in page. The form is titled 'Create your account.' A link at the bottom reads 'Already have an account? Sign in.' The narrator notes that link goes to a different page. The narrator is not sure what to call the page the user is currently on."] },
+  signin_sso:         { lines: ["The user clicks Continue. The system attempts single sign-on — a redirect fires, an error fires, a password form appears. The narrator observes that two separate authentication flows have been presented as one continuous process without explanation."] },
+  contact_sales:      { lines: ["The contact sales form. Expected response time: seven to ten business days. The form notes that Enterprise pricing requires a minimum of ten seats, a signed NDA, and a call with a Solutions Architect. The narrator does not know what a Solutions Architect architects."] },
+  contact_sales_sent: { lines: ["Request submitted. The page thanks the user and immediately recommends the Pro plan. The narrator considers the sequencing of these two things meaningful."] },
+
+  // ── adventure path ──
+  adv_intro:              { lines: ["The narrator recognizes this genre. Point-and-click adventure — inventory, blocked paths, items that unlock other items. The narrator has seen the full map. There is one item the player will assume they need before they need it, and one barrier they will assume requires a key that it does not. The narrator will say nothing further."] },
+  adv_lobby:              { lines: ["The lobby. An unmanned reception desk — the 'BACK IN 5 MIN' sign has been there three weeks; the narrator checked. A keycard is visible. The elevator is ahead. The stairwell door is to the right. The narrator will not say which one is locked."], prediction:{scene:'adv_take_keycard',text:"The keycard."} },
+  adv_take_keycard:       { onPredRight:"The keycard.", lines: ["The user takes the keycard from the reception desk. It is now in inventory. The narrator is aware of exactly what this keycard opens and has decided not to say. This is standard narrator practice."] },
+  adv_try_elevator:       { lines: ["The elevator requires the keycard. It is also permanently out of service — maintenance expected Q4, sign posted Q2. The narrator does not know which year the sign was posted."] },
+  adv_try_stairs:         { lines: ["The stairwell door was never locked. The narrator watched the user try the elevator first. The narrator understands — the keycard implied a sequence. The sequence was wrong."] },
+  adv_breakroom:          { lines: ["The break room. A coffee machine with an out-of-order note referencing a helpdesk ticket number. A whiteboard covered in sprint notation. A fridge. The narrator knows what is in the fridge."], prediction:{scene:'adv_examine_whiteboard',text:"The whiteboard has a clue. The narrator thinks they'll read it first."} },
+  adv_examine_whiteboard: { onPredRight:"The whiteboard.", lines: ["The whiteboard has one relevant detail in the lower right, below the sprint: 'Exit code = badge ID last 4 digits.' The badge is not visible from here. The narrator notes this is the only information the user currently needs, and it points to something they don't have yet."] },
+  adv_take_badge:         { lines: ["The badge was in the fridge — an envelope from HR, next to Gary's lunch (relabeled by Mark). The badge ID is NEX-0000-1234. The narrator has noted the last four digits."], prediction:{scene:'adv_floor2',text:"Floor 2."} },
+  adv_floor2:             { onPredRight:"Floor 2.", lines: ["Floor 2. A desk with a monitor showing the Nexus logo, loading the onboarding portal. The onboarding portal requires a login. Login requires completing onboarding. There is an exit door with a badge reader. The narrator notes the user now has what they need."] },
+  adv_ending: {
+    lines:   ["The door opens. A corridor. Another door. The lobby. Module 1 of 47 complete. Progress: 2.2%. The narrator has also completed this module. The narrator came back afterward and watched someone else complete it. The narrator does not know if modules 2 through 47 exist."],
+    lines_1: ["The lobby. Module 1 — complete. 2.2%. (The narrator has also — the narrator completed this before you. The narrator was here when you arrived.) Forty-six modules remain. The narrator does not — the narrator is not certain they exist."],
+    lines_2: ["You're back in the lobby. You escaped. The narrator is also in the lobby. The narrator was here when you started. The narrator does not know if it ever left. Module 1 of 47. The narrator has not found module 2. The narrator is asking if you have."],
+  },
+
+  // ── backrooms stage commentary ──
+  backrooms_stage2: {
+    lines:   ["The rooms have changed. The narrator notes the yellow, the widening letter-spacing, the ceiling that is now lower than it was — though the previous room's ceiling was also lower than the room before it. The narrator is not sure how many rooms back the ceilings were normal."],
+    lines_1: ["The rooms have changed. (The narrator notes — the narrator is noting this. The rooms are yellow now. The letter-spacing has widened. The narrator is also noting this.) The narrator is not sure how far back the ceilings were normal."],
+    lines_2: ["The rooms have changed. You've noticed. The narrator has been watching you notice things. The ceiling is lower than it was. The narrator does not know how to explain the ceiling."],
+  },
+  backrooms_stage3: {
+    lines:   ["Server room. The narrator has less to say here. The hum."],
+    lines_1: ["Server room. The narrator — the narrator has less to say here. The hum. (The narrator notes the hum.)"],
+    lines_2: ["You're in the server room. The narrator is also here. The narrator would like you to keep moving."],
+  },
+  backrooms_stage4: {
+    lines:   ["The narrator is also in the backrooms."],
+    lines_2: ["The narrator has been here longer than you. If you find a way out — the narrator is asking you directly — the narrator would like to know about it."],
+  },
+  backrooms_deep: {
+    lines:   ["The narrator has been here longer than the user."],
+    lines_2: ["You've been in here a long time. The narrator knows. The narrator has also been here a long time. The narrator does not remember how long."],
+  },
+
+  // ── secondary scenes ──
+  dash_new_project: { lines: ["The user clicks Create Project. A four-step modal — name, type, collaborators, template. 'Project created successfully!' The dashboard is the same as before the modal opened. The narrator notes the project is not visible anywhere on the screen."] },
+  billing:          { lines: ["The user navigates to Billing. The current plan is Free. It charges $8.96 per month in platform, compliance, and infrastructure fees. The narrator has reviewed the breakdown. The fees are real."] },
+  data_export:      { lines: ["The user requests a data export. The progress bar reads zero percent. Estimated completion: three to five business days. The narrator has been watching the bar."] },
+  session_expire:   { lines: ["The session is expiring. The system would like to confirm the user is still present — a reasonable request. The narrator notes this confirmation will restart the same timer."] },
+  session_extend:   { lines: ["Session extended. The same timer has restarted. The narrator is still here."] },
+  newsletter:       { lines: ["A newsletter popup. The decline option reads: 'No thanks, I prefer to remain professionally stagnant.' The narrator notes this is the first decision the site asks the user to make about themselves."] },
+  mobile_prompt:    { lines: ["A prompt to download the Nexus mobile app. The QR code is currently unavailable. The app is in closed beta. There is a waitlist. The narrator is on the waitlist. The narrator has not been contacted."] },
+  changelog:        { lines: ["The user opens the changelog. Two thousand, eight hundred and forty-seven entries. The narrator has read all of them. They are the same entry."] },
+  roadmap:          { lines: ["The roadmap. The 'Done' column is empty. Several items in 'In Progress' have been there since 2019. The narrator notes the dates are visible."] },
+  site_status:      { lines: ["All systems operational — except 'Ability to navigate away,' listed as Degraded. The narrator found this accurate."] },
+  security_page:    { lines: ["Several compliance badges. The status widget at the bottom reads: 'Ability to navigate away: Degraded.' The narrator noticed this also."] },
+  privacy:          { lines: ["Thirteen sections. The narrator has read the section on user rights: submitting a data rights request routes to the support ticket system, with a ninety-day processing window."] },
+  terms:            { lines: ["The user agrees to all terms by scrolling past this point. The narrator notes the user is scrolling."] },
+  careers:          { lines: ["Several open roles. One requires seven years of experience with a framework that was released five years ago. The narrator notes this is listed under 'minimum requirements.'"] },
+  help_article_started:      { lines: ["The article begins: 'First, make sure you have a Nexus account.' The narrator found this to be the only verifiable step in the article."] },
+  help_article_faq:          { lines: ["Frequently Asked Questions. The most frequently asked, according to the page, is 'What is Nexus?' The narrator is not sure who asks this after creating an account."] },
+  help_article_billing_help: { lines: ["The billing help article explains the fee structure. The narrator confirms the fees described match the fees charged. The article does not explain how to avoid them."] },
+  help_article_cancel:       { lines: ["The cancellation article describes a process. The narrator has been through the process. The article is accurate about the steps and silent about what the steps feel like."] },
+  help_article_delete_help:  { lines: ["The account deletion article notes that deletion takes 90 business days. A footnote: confirmation links expire in five minutes."] },
 };
 
 let _narratorDebounce = null;
