@@ -6061,6 +6061,33 @@ function scene_adv_ending() {
 
 // ────────────── BACKROOMS ──────────────
 
+// ── backrooms helpers ──
+function brBrowserName() {
+  const ua = navigator.userAgent;
+  if (ua.includes('Firefox')) return 'Firefox';
+  if (ua.includes('Edg/')) return 'Edge';
+  if (ua.includes('Chrome')) return 'Chrome';
+  if (ua.includes('Safari')) return 'Safari';
+  return 'Unknown Browser';
+}
+function brTimezoneRegion() {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const parts = tz.split('/');
+  return parts.length > 1 ? parts[0].toLowerCase().replace(/_/g, '-') : 'unknown-region';
+}
+function brFormatDuration(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  return m > 0 ? `${m}m ${s % 60}s` : `${s}s`;
+}
+function brHex(n, pad) {
+  pad = pad || 6;
+  return Math.abs(Math.floor(n)).toString(16).toUpperCase().padStart(pad, '0');
+}
+function brFaultCode(roomArg) {
+  return '0x' + brHex(roomArg * 7 + S.depth);
+}
+
 function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
