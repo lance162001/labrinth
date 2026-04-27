@@ -501,6 +501,9 @@ body.br-mode{background:#e8d5a3}
 body.br-deep{background:#0d0a06}
 @keyframes br-flicker{0%,94%,96%,100%{filter:brightness(1)}95%{filter:brightness(.85)}}
 @keyframes br-deep-flicker{0%,88%,91%,95%,100%{filter:brightness(1)}89%{filter:brightness(.6)}94%{filter:brightness(.85)}}
+body.br-fc-1 .nav-links{font-family:'Courier New',monospace}
+body.br-fc-2 .nav-links,.br-fc-2 .btn{font-family:'Courier New',monospace}
+body.br-fc-3 .nav-links,.br-fc-3 .btn,.br-fc-3 h1,.br-fc-3 .hero-h1{font-family:'Courier New',monospace}
 </style>
 </head>
 <body>
@@ -6713,6 +6716,38 @@ function scene_backrooms(roomArg) {
   document.body.classList.toggle('br-deep', stage >= 4);
   setOverlay('');
 
+  // title creep
+  var sessionHex = brHex(Math.floor(performance.now()), 6);
+  if (stage === 1) {
+    if (slot <= 8) document.title = 'Nexus — Dashboard';
+    else if (slot <= 15) document.title = 'Nexus — Diagnostic Console';
+    else if (slot <= 22) document.title = 'Nexus — session/' + sessionHex;
+    else document.title = sessionHex;
+  } else if (stage === 2) {
+    document.title = sessionHex + ' — active';
+  } else if (stage === 3) {
+    document.title = sessionHex;
+  } else {
+    document.title = '';
+  }
+
+  // filter creep (stage 1 only — subtle saturation/brightness drain)
+  if (stage === 1) {
+    var sat = Math.round(100 - slot * 1.4);
+    var bri = Math.round(100 - slot * 0.35);
+    document.body.style.filter = 'saturate(' + sat + '%) brightness(' + bri + '%)';
+  } else {
+    document.body.style.filter = '';
+  }
+
+  // font creep (stage 1, slots 10+)
+  document.body.classList.remove('br-fc-1', 'br-fc-2', 'br-fc-3');
+  if (stage === 1) {
+    if (slot >= 22) document.body.classList.add('br-fc-3');
+    else if (slot >= 16) document.body.classList.add('br-fc-2');
+    else if (slot >= 10) document.body.classList.add('br-fc-1');
+  }
+
   brBuildUrl(stage, slot, roomArg);
 
   if (stage === 1) {
@@ -6731,7 +6766,9 @@ function scene_backrooms_next() {
 }
 
 function scene_backrooms_exit() {
-  document.body.classList.remove('br-mode', 'br-deep');
+  document.body.classList.remove('br-mode', 'br-deep', 'br-fc-1', 'br-fc-2', 'br-fc-3');
+  document.body.style.filter = '';
+  document.title = 'Nexus';
   S.exportRequested = false;
   setOverlay('');
   try { history.replaceState(null, '', '/'); } catch(e) {}
