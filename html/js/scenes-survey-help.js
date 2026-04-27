@@ -29,6 +29,7 @@ function scene_survey() {
   incDepth();
   S.surveyStep = 0;
   S.surveyStarRating = 0;
+  markNarratorMilestone('survey', 'survey_enter');
   clearSocialProof();
   setOverlay('');
   renderSurveyStep();
@@ -130,7 +131,13 @@ function renderSurveyStep() {
   }
 }
 
-function scene_survey_next() { S.surveyStep = Math.min(S.surveyStep+1, SURVEY_QS.length-1); renderSurveyStep(); }
+function scene_survey_next() {
+  S.surveyStep = Math.min(S.surveyStep+1, SURVEY_QS.length-1);
+  if (S.surveyStep === 7)  { markNarratorMilestone('survey','survey_q8');  narratorEnter('survey_q8'); }
+  if (S.surveyStep === 14) { markNarratorMilestone('survey','survey_q15'); narratorEnter('survey_q15'); }
+  if (S.surveyStep === 21) { markNarratorMilestone('survey','survey_q22'); narratorEnter('survey_q22'); }
+  renderSurveyStep();
+}
 function scene_survey_back() { S.surveyStep = Math.max(0, S.surveyStep-1); renderSurveyStep(); }
 function scene_survey_abandon() {
   toast('Progress saved.');
@@ -138,6 +145,7 @@ function scene_survey_abandon() {
   setTimeout(()=>scene_main(),2000);
 }
 function scene_survey_done() {
+  markNarratorMilestone('survey', 'survey_done');
   S.onboardingDone.survey = true;
   root.innerHTML = navHTML() + `
   <div style="max-width:460px;margin:6rem auto;padding:2rem 1.5rem;text-align:center">
