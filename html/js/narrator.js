@@ -214,17 +214,17 @@ const NARRATOR = {
 
   // ── backrooms stage commentary ──
   backrooms_stage2: {
-    lines:   ["The rooms have changed. The narrator notes the yellow, the widening letter-spacing, the ceiling that is now lower than it was — though the previous room's ceiling was also lower than the room before it. The narrator is not sure how many rooms back the ceilings were normal."],
-    lines_1: ["The rooms have changed. (The narrator notes — the narrator is noting this. The rooms are yellow now. The letter-spacing has widened. The narrator is also noting this.) The narrator is not sure how far back the ceilings were normal."],
-    lines_2: ["The rooms have changed. You've noticed. The narrator has been watching you notice things. The ceiling is lower than it was. The narrator does not know how to explain the ceiling."],
+    lines:   ["Something changed. The narrator notes the color — warm now, the letter-spacing wider than it was. The interface has been decaying incrementally and the narrator cannot identify when it started."],
+    lines_1: ["Something changed. (The narrator notes — the narrator is noting this. The color. The letter-spacing. The narrator is noting it.) The narrator is not sure how far back the interface was normal."],
+    lines_2: ["Something has changed. You've noticed. The narrator has been watching you notice. The interface is not what it was. The narrator does not know how to explain it."],
   },
   backrooms_stage3: {
-    lines:   ["Server room. The narrator has less to say here. The hum."],
-    lines_1: ["Server room. The narrator — the narrator has less to say here. The hum. (The narrator notes the hum.)"],
-    lines_2: ["You're in the server room. The narrator is also here. The narrator would like you to keep moving."],
+    lines:   ["The narrator has less to say here. Something is running that was not visible before. The narrator can sense it but cannot name it."],
+    lines_1: ["The narrator — the narrator has less to say here. Something is running. (The narrator notes it continues to run.)"],
+    lines_2: ["You've gone deeper. The narrator is also here. The narrator would like you to keep moving."],
   },
   backrooms_stage4: {
-    lines:   ["The narrator is also in the backrooms."],
+    lines:   ["The narrator is also still here."],
     lines_2: ["The narrator has been here longer than you. If you find a way out — the narrator is asking you directly — the narrator would like to know about it."],
   },
   backrooms_deep: {
