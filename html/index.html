@@ -6128,6 +6128,130 @@ function brBuildUrl(stage, slot, roomArg) {
   try { history.replaceState(null, '', S.brUrlPath); } catch(e) {}
 }
 
+function brStage1(slot, displayNum, roomArg) {
+  const browser = brBrowserName();
+  const platform = navigator.platform;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const time = new Date().toLocaleTimeString();
+  const trialBar = '<span style="font-size:.8rem;color:var(--g400)">Free Trial — <strong style="color:var(--red)">14 days remaining</strong></span>';
+  const navOpts = [
+    '<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>',
+    '<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">→ Next Room</button><button class="nav-link" data-go="backrooms_next">→ Next Room</button><button class="nav-link" data-go="backrooms_next">→ Next Room</button></div>',
+    '<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>',
+    '<div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>',
+    '<a class="nav-logo" data-go="dashboard"><span>Nex</span>us</a><div class="nav-links"><button class="nav-link" data-go="backrooms_next">Home</button><button class="nav-link" data-go="backrooms_next">Features</button><button class="nav-link" data-go="backrooms_next">Pricing</button></div>',
+  ];
+  const nav = navOpts[slot % navOpts.length];
+  const shell = function(content) {
+    return '<div class="nav">' + nav + '<div>' + trialBar + '</div></div><div style="padding:2rem"><div style="max-width:500px">' + content + '</div></div>';
+  };
+
+  // Landmark rooms
+  if (slot === 1) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>' +
+    '<div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ' + displayNum + '.</div>' +
+    '<div style="font-size:.875rem;color:var(--g600);margin-bottom:.4rem">No errors found.</div>' +
+    '<div style="font-size:.75rem;color:var(--g400);font-style:italic">(you have been here before.)</div>' +
+    '<div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>');
+
+  if (slot === 3) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Cookie Preferences</h1>' +
+    '<div style="background:var(--g50);border:1px solid var(--g200);border-radius:8px;padding:1.25rem;margin-bottom:1rem;font-size:.82rem;color:var(--g600);line-height:1.9">' +
+    'We use cookies to improve your experience.<br><br>' +
+    '<strong>session_ghost</strong> — always active<br>' +
+    '<strong>render_id_orphan</strong> — always active<br>' +
+    '<strong>consent_cache_stale</strong> — always active' +
+    '</div>' +
+    '<div style="display:flex;gap:.75rem"><button class="btn btn-primary" data-go="backrooms_next">Accept All</button><button class="btn btn-secondary" data-go="backrooms_next">Customize</button></div>');
+
+  if (slot === 7) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1.5rem">Simple, transparent pricing.</h1>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem">' +
+    '<div style="border:1px solid var(--g200);border-radius:8px;padding:1rem;font-size:.8rem"><div style="font-weight:600;margin-bottom:.5rem">Starter</div><div style="font-size:1.2rem;font-weight:700;color:var(--red)">$NaN<span style="font-size:.75rem;font-weight:400;color:var(--g400)">/mo</span></div><button class="btn btn-secondary" style="width:100%;margin-top:1rem;font-size:.75rem" data-go="backrooms_next">Proceed →</button></div>' +
+    '<div style="border:2px solid var(--blue);border-radius:8px;padding:1rem;font-size:.8rem"><div style="font-weight:600;margin-bottom:.5rem">Pro</div><div style="font-size:1.2rem;font-weight:700;color:var(--red)">$undefined<span style="font-size:.75rem;font-weight:400;color:var(--g400)">/mo</span></div><button class="btn btn-primary" style="width:100%;margin-top:1rem;font-size:.75rem" data-go="backrooms_next">Proceed →</button></div>' +
+    '<div style="border:1px solid var(--g200);border-radius:8px;padding:1rem;font-size:.8rem"><div style="font-weight:600;margin-bottom:.5rem">Enterprise</div><div style="font-size:1rem;font-weight:700;color:var(--g400)">Contact [object Object]</div><button class="btn btn-secondary" style="width:100%;margin-top:1rem;font-size:.75rem" data-go="backrooms_next">Proceed →</button></div>' +
+    '</div>');
+
+  if (slot === 12) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:.5rem">Create your account</h1>' +
+    '<div style="font-size:.75rem;color:var(--g400);margin-bottom:1.5rem">Step 8 of 3</div>' +
+    '<div style="height:4px;background:var(--g100);border-radius:2px;margin-bottom:1.5rem"><div style="width:100%;height:100%;background:var(--blue);border-radius:2px"></div></div>' +
+    '<div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Continue →</button></div>');
+
+  if (slot === 15) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Features</h1>' +
+    '<div style="background:#000;border-radius:6px;padding:2rem;text-align:center;margin-bottom:1rem">' +
+    '<div style="color:#666;font-size:.7rem;margin-bottom:1rem">Loading: indeterminate</div>' +
+    '<div style="height:6px;background:#1a1a1a;border-radius:3px"><div style="width:95%;height:100%;background:#444;border-radius:3px"></div></div>' +
+    '<div style="color:#444;font-size:.65rem;margin-top:.75rem">95%</div>' +
+    '</div>' +
+    '<div style="font-size:.72rem;color:var(--g400);font-style:italic">This has been loading since before you arrived.</div>' +
+    '<div style="margin-top:1.5rem"><button class="btn btn-secondary" data-go="backrooms_next">Proceed →</button></div>');
+
+  if (slot === 18) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>' +
+    '<div style="font-size:.875rem;color:var(--g500);margin-bottom:1rem">You are in Room ' + displayNum + '.</div>' +
+    '<div class="alert" style="font-size:.8rem;background:#f0fdf4;border-color:var(--green);margin-bottom:1rem">✓ All systems operational.</div>' +
+    '<div style="font-size:.72rem;color:var(--g300);font-style:italic">Getting colder.</div>' +
+    '<div style="font-size:.8rem;color:var(--g400);margin-top:.75rem">Free Trial — <strong style="color:var(--red)">14 days remaining</strong></div>' +
+    '<div style="margin-top:1.5rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>');
+
+  if (slot === 22) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>' +
+    '<div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ' + displayNum + '.</div>' +
+    '<div style="font-size:.75rem;color:var(--g400);margin-bottom:.4rem">Client: ' + browser + ' / ' + platform + '</div>' +
+    '<div style="font-size:.75rem;color:var(--g400);margin-bottom:1.5rem">Viewport: ' + vw + '\xd7' + vh + '</div>' +
+    '<div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>');
+
+  if (slot === 25) return shell(
+    '<h1 style="font-size:1rem;font-weight:600;margin-bottom:1rem;font-family:\'Courier New\',monospace">Diagnostic Console</h1>' +
+    '<div style="font-size:.82rem;color:var(--g500);margin-bottom:1rem">You are in Room ' + displayNum + '.</div>' +
+    '<div style="font-size:.78rem;color:var(--g600);margin-bottom:.4rem">Fault detected in layer below.</div>' +
+    '<div style="font-size:.72rem;color:var(--g400);font-style:italic;margin-bottom:1.75rem">Descending to network layer.</div>' +
+    '<button style="padding:.55rem 1.4rem;background:none;border:1px solid var(--g300);color:var(--g600);font-family:\'Courier New\',monospace;font-size:.82rem;cursor:pointer;border-radius:0" data-go="backrooms_next">continue</button>');
+
+  // Templates (slot % 5)
+  const t = slot % 5;
+  var content;
+  if (t === 0) {
+    var ok = slot % 3 !== 0;
+    content = '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">System Status</h1>' +
+      '<div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">Room ' + displayNum + ' — ' + time + '</div>' +
+      '<div class="alert" style="font-size:.8rem;background:' + (ok ? '#f0fdf4' : '#fef2f2') + ';border-color:' + (ok ? 'var(--green)' : 'var(--red)') + '">' +
+      (ok ? '✓ All systems operational.' : '⚠ Fault state: nominal.') + '</div>' +
+      '<div style="font-size:.72rem;color:var(--g400);margin-top:.75rem">Client: ' + browser + ' / ' + platform + '</div>' +
+      '<div style="font-size:.72rem;color:var(--g400)">Viewport: ' + vw + '\xd7' + vh + '</div>' +
+      '<div style="margin-top:1.5rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>';
+  } else if (t === 1) {
+    var signers = ['— The Nexus Infrastructure Team','— Automated Diagnostics','— Cache Warming Process','— An Automated Process'];
+    content = '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Notice</h1>' +
+      '<div style="font-size:.875rem;color:var(--g600);margin-bottom:1rem;line-height:1.8">Your session has been noted.<br>This is routine.<br>No action is required.</div>' +
+      '<div style="font-size:.72rem;color:var(--g400);margin-bottom:1.5rem">' + signers[slot % 4] + '</div>' +
+      '<button class="btn btn-secondary" data-go="backrooms_next">Proceed →</button>';
+  } else if (t === 2) {
+    content = '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Log</h1>' +
+      '<div style="font-family:\'Courier New\',monospace;font-size:.72rem;color:var(--g500);line-height:2;margin-bottom:1.25rem">' +
+      '<div>&gt; Room ' + displayNum + ': initialized</div>' +
+      '<div>&gt; Client: ' + browser + '</div>' +
+      '<div>&gt; Viewport: ' + vw + '\xd7' + vh + ' — logged</div>' +
+      '<div>&gt; Session: active</div>' +
+      '<div>&gt; Status: OK</div>' +
+      '</div>' +
+      '<button class="btn btn-primary" data-go="backrooms_next">Proceed →</button>';
+  } else if (t === 3) {
+    content = '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Dashboard</h1>' +
+      '<div class="alert" style="font-size:.8rem;background:#eff6ff;border-color:var(--blue);margin-bottom:1rem">Free Trial — <strong style="color:var(--red)">14 days remaining</strong></div>' +
+      '<div style="font-size:.65rem;color:var(--g300);font-style:italic">(has always been 14 days remaining)</div>' +
+      '<div style="margin-top:1.5rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>';
+  } else {
+    content = '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>' +
+      '<div style="font-size:.875rem;color:var(--g500);margin-bottom:.4rem">Pipeline status: nominal.</div>' +
+      '<div style="font-size:.75rem;color:var(--g400);margin-bottom:1.5rem">No action required.</div>' +
+      '<div style="display:flex;gap:.75rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>';
+  }
+  return shell(content);
+}
+
 function scene_backrooms_enter() {
   incDepth();
   S.brVisited = true;
