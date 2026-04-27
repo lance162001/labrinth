@@ -4785,7 +4785,11 @@ function renderSurveyStep() {
   } else if (q.type === 'nps') {
     fieldHtml = `<div class="nps-row">${[...Array(11).keys()].map(n=>`<button class="nps-btn" onclick="this.parentElement.querySelectorAll('.nps-btn').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">${n}</button>`).join('')}</div><div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>`;
   } else if (q.type === 'radio') {
-    const opts = (S.surveyStep === 18 && S.brVisited) ? [...q.opts, 'Yes. Something is in the walls. The code is LEVEL0.'] : q.opts;
+    const opts = (S.surveyStep === 18 && S.brVisited)
+      ? [...q.opts, S.brRoom > 76
+        ? 'Yes. The code is LEVEL0. You already know this.'
+        : 'Yes. Something is in the walls. The code is LEVEL0.']
+      : q.opts;
     fieldHtml = `<div class="survey-opts">${opts.map(o=>`<label class="survey-opt"><input type="radio" name="sq"> ${o}</label>`).join('')}</div>`;
   } else if (q.type === 'check') {
     fieldHtml = `<div class="survey-opts">${q.opts.map(o=>`<label class="survey-opt"><input type="checkbox"> ${o}</label>`).join('')}</div>`;
@@ -6727,11 +6731,12 @@ function scene_backrooms_next() {
 }
 
 function scene_backrooms_exit() {
-  document.body.classList.remove('br-mode');
+  document.body.classList.remove('br-mode', 'br-deep');
   S.exportRequested = false;
   setOverlay('');
+  try { history.replaceState(null, '', '/'); } catch(e) {}
   toast('📦 Export complete. 1 file downloaded.');
-  setTimeout(() => scene_dashboard(), 800);
+  setTimeout(function() { scene_dashboard(); }, 800);
 }
 
 // ────────────── ROUTER ──────────────
