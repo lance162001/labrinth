@@ -141,6 +141,19 @@ const NARRATOR = {
 
 let _narratorDebounce = null;
 
+function _pickLines(entry) {
+  const g = S.narratorGlitch || 0;
+  for (let t = Math.min(g, 2); t >= 1; t--) {
+    const variant = entry['lines_' + t];
+    if (variant) {
+      const raw = typeof variant === 'function' ? variant() : variant;
+      return g >= 3 ? raw.map(l => glitchText(l, g - 2)) : raw;
+    }
+  }
+  const base = typeof entry.lines === 'function' ? entry.lines() : (entry.lines || []);
+  return g >= 3 ? base.map(l => glitchText(l, g - 2)) : base;
+}
+
 function narratorEnter(key) {
   clearTimeout(_narratorDebounce);
   _narratorDebounce = setTimeout(() => _narratorDo(key), 900);
@@ -164,7 +177,7 @@ function _narratorDo(key) {
     msgs.push({ text: reaction, pred: false });
   }
 
-  const lines = typeof entry.lines === 'function' ? entry.lines() : (entry.lines || []);
+  const lines = _pickLines(entry);
   lines.forEach(l => msgs.push({ text: l, pred: false }));
 
   msgs.forEach(m => {
