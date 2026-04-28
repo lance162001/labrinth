@@ -234,6 +234,7 @@ const NARRATOR = {
 
   // ── secondary scenes ──
   dash_new_project: { lines: ["The user clicks Create Project. A four-step modal — name, type, collaborators, template. 'Project created successfully!' The dashboard is the same as before the modal opened. The narrator notes the project is not visible anywhere on the screen."] },
+  project: { lines: ["The user has entered the project. NexusAI greets them. Everything looks fine."] },
   billing:          { lines: ["The user navigates to Billing. The current plan is Free. It charges $8.96 per month in platform, compliance, and infrastructure fees. The narrator has reviewed the breakdown. The fees are real."] },
   data_export:      { lines: ["The user requests a data export. The progress bar reads zero percent. Estimated completion: three to five business days. The narrator has been watching the bar."] },
   session_expire:   { lines: ["The session is expiring. The system would like to confirm the user is still present — a reasonable request. The narrator notes this confirmation will restart the same timer."] },
