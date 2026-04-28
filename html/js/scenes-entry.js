@@ -17,6 +17,9 @@ function scene_home() {
     <div style="display:flex;gap:2.5rem;margin-top:3.5rem;flex-wrap:wrap;justify-content:center">
       ${['4.9 ★ on G2','#1 Product of the Day','SOC2 Certified','99.99% Uptime'].map(t=>`<div style="font-size:.8rem;color:var(--g400);font-weight:500">${t}</div>`).join('')}
     </div>
+    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener"
+       style="display:block;margin-top:4rem;opacity:.15;font-size:.7rem;color:inherit;text-decoration:none;cursor:pointer;transition:opacity .2s"
+       onmouseover="this.style.opacity='.4'" onmouseout="this.style.opacity='.15'">·</a>
   </div>`;
   setOverlay('');
 }
