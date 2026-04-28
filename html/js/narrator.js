@@ -320,6 +320,11 @@ function narratorSay(text, isPrediction) {
     return;
   }
   S.narratorMsgCount = (S.narratorMsgCount || 0) + 1;
+  const justSlipped = S.narratorMsgCount === 4;
+  if(justSlipped) {
+    const sub = document.getElementById('narrator-sub');
+    if(sub) sub.textContent = 'Online · still here';
+  }
   const justAwoke = S.narratorMsgCount === 8;
   if(justAwoke) {
     const panel = document.querySelector('.chat-panel');
@@ -330,10 +335,8 @@ function narratorSay(text, isPrediction) {
     }
     const btn = document.querySelector('.chat-btn');
     if(btn) btn.classList.add('narrator-awake');
-    const title = document.getElementById('narrator-title');
     const sub = document.getElementById('narrator-sub');
-    if(title) title.textContent = '🎭 The Narrator';
-    if(sub) sub.textContent = 'commentary track';
+    if(sub) sub.textContent = 'Has been here.';
     const inp = document.getElementById('chat-in');
     if(inp) inp.placeholder = 'Say something…';
   }
@@ -356,7 +359,9 @@ function openNarratorPanel(clearUnread) {
     const b = document.querySelector('.narrator-badge');
     if(b) b.style.display = 'none';
   }
-  const awake = (S.narratorMsgCount || 0) >= 8;
+  const mc = S.narratorMsgCount || 0;
+  const awake = mc >= 8;
+  const _sub = mc >= 8 ? 'Has been here.' : mc >= 4 ? 'Online · still here' : 'Online · replies instantly';
   const panel = document.createElement('div');
   panel.className = 'chat-panel' + (awake ? '' : ' chatbot');
   panel.innerHTML = `
@@ -364,8 +369,8 @@ function openNarratorPanel(clearUnread) {
       <div style="display:flex;align-items:center;gap:.6rem">
         ${awake ? '' : '<div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0"></div>'}
         <div>
-          <div class="narrator-title" id="narrator-title">${awake ? '🎭 The Narrator' : 'Nexus Assistant'}</div>
-          <div class="narrator-sub" id="narrator-sub">${awake ? 'commentary track' : 'Online · replies instantly'}</div>
+          <div class="narrator-title" id="narrator-title">Nexus Assistant</div>
+          <div class="narrator-sub" id="narrator-sub">${_sub}</div>
         </div>
       </div>
       ${S.narratorDismissed ? '' : '<button onclick="S.narratorDismissed=true;document.querySelector(\'.chat-panel\').remove()" style="background:none;border:none;color:#e8e8e0;cursor:pointer;opacity:.5;font-size:1rem;line-height:1;padding:0">✕</button>'}

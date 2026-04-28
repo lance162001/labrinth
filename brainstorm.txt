@@ -1,0 +1,20 @@
+ideas:
+rotate the screen
+zoom in 20x and require the user to scroll like crazy to navigate to anything
+add a well hidden scavenger hunt to the site that requires clicking on specific out of place pixels. collecting them all leads to a special path
+have a real chat-room between anyone who gets to a specific screen in the community hub
+have a page where you can create new paths and pages that are in the real site, or modify existing pages, that last 24 hours
+set up a r/place type page hidden in a path
+add lots of clipart and video, ai-generated slop type of content
+make the careers page and application stuff work similar to workday
+have the nexus site link to other fake company sites with their own paths (and different domain)
+have the nexus site have sub-domains for other things
+set up persistent logging for actions users take in the site saved in a sqlite db. i.e the order of clicks, time between actions, text written, and any other easy-to-store and interesting info
+a backrooms-type path that goes on seemingly forever, with increasingly incomprehensible and unsettling design
+
+
+overarching ideas to consider for all changes:
+the deeper into a path you go, the more extreme the tone should be. all paths start at the same generic saas site, but should branch off into radically different directions. the most important part of each path should be how extreme the tone becomes, how unique it is for the user, and how unpredictable the expereience is for a new user.
+certain paths should have content / pages that require information from another path to proceed, such as credentials or a hint towards where to look in the site for something interesting
+
+
