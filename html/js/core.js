@@ -33,6 +33,8 @@ const S = {
   brBattery: null,
   brUrlPath: '',
   exportGlitchTimer: null,
+  blogVisits: 0,
+  lastBlogEra: '',
 };
 
 function incDepth() {
