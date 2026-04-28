@@ -509,3 +509,100 @@ function scene_project() {
   S.sessionTimer = setTimeout(() => scene_session_expire(), 38000);
 }
 
+const _NEXUS_RULES = [
+  { re: /\b(task|add|create)\b/,        resp: kw => `Great point about <strong>${kw}</strong>! I've added you to the Nexus Launch Partner waitlist ($49/mo). You're all set.`,             act: 'added you to the Launch Partner waitlist',        eff: null },
+  { re: /\b(deadline|due|date)\b/,      resp: kw => `Noted on <strong>${kw}</strong>! I've updated your billing cycle to align with this timeline.`,                                     act: 'updated your billing cycle',                      eff: null },
+  { re: /\b(delete|remove|cancel)\b/,   resp: ()  => `Understood! I've submitted a deletion request for your workspace. You have 24 hours to cancel.`,                                   act: 'submitted a deletion request for your workspace', eff: () => { S.deletionPending = true; } },
+  { re: /\bhelp\b/,                     resp: ()  => `On it! I've opened a support ticket on your behalf. Estimated response time: 6–8 weeks.`,                                          act: 'opened a support ticket on your behalf',          eff: null },
+  { re: /\b(team|invite|member)\b/,     resp: kw => `Great thinking! I've sent invitations to your entire contacts list regarding <strong>${kw}</strong>. They'll be thrilled.`,         act: 'sent invitations to your entire contacts list',   eff: () => { S.invitesSent = true; } },
+  { re: /\b(priority|urgent)\b/,        resp: kw => `Absolutely! I've upgraded you to Priority Support ($29/seat/mo) based on your <strong>${kw}</strong> request. You're all set!`,     act: 'upgraded you to Priority Support ($29/seat/mo)',  eff: () => { S.prioritySupport = true; } },
+  { re: /\b(update|change)\b/,          resp: kw => `Done! I've pushed an <strong>${kw}</strong> to all connected integrations (0 integrations connected).`,                             act: 'pushed an update to all connected integrations',  eff: null },
+  { re: /\b(milestone|goal|okr)\b/,     resp: kw => `Perfect! I've aligned your OKRs with Nexus's Q4 company goals based on your <strong>${kw}</strong>. You're a great fit!`,          act: 'aligned your OKRs with company goals',            eff: () => { S.okrsAligned = true; } },
+  { re: /\b(test|testing)\b/,           resp: kw => `Great! I've enabled <strong>${kw}</strong> Mode. All your data is now read-only for safety.`,                                       act: 'enabled Test Mode — data is now read-only',       eff: () => { S.testMode = true; } },
+  { re: /\b(hi|sup|yo)\b/,              resp: ()  => `Hi [First Name]! I've personalized your workspace based on your greeting style. Enjoy!`,                                           act: 'personalized your workspace',                     eff: () => { S.greetingStyle = 'hi'; document.documentElement.style.setProperty('--blue','#f59e0b'); } },
+  { re: /\bhey\b/,                      resp: ()  => `Hi [First Name]! I've personalized your workspace based on your greeting style. Enjoy!`,                                           act: 'personalized your workspace',                     eff: () => { S.greetingStyle = 'hey'; } },
+  { re: /\bhello\b/,                    resp: ()  => `Hi [First Name]! I've personalized your workspace based on your greeting style. Enjoy!`,                                           act: 'personalized your workspace',                     eff: () => { S.greetingStyle = 'hello'; } },
+  { re: /\b(break|broken|bug|error)\b/, resp: kw => `Thanks for the <strong>${kw}</strong> report! I've filed it with our engineering team. ETA: 6–8 weeks.`,                           act: 'filed a bug report with engineering',             eff: null },
+  { re: /\b(stop|quit|no|wait)\b/,      resp: ()  => `Got it! I'll continue working in the background and notify you when everything's done.`,                                           act: 'continued working in the background',             eff: () => { S.nexusBackground = true; } },
+  { re: /\b(why|wtf|what)\b/,           resp: kw => `Great question about <strong>${kw}</strong>! I've added this to your project FAQ. It's now visible to all members.`,               act: 'added your question to the project FAQ',          eff: null },
+  { re: /\bplease\b/,                   resp: ()  => `Of course! I've enabled Polite Mode. Your experience just got 12% more courteous.`,                                                act: 'enabled Polite Mode',                             eff: () => { S.politeMode = true; } },
+];
+
+function nexusResponse(msg) {
+  const m = msg.toLowerCase();
+  for (const rule of _NEXUS_RULES) {
+    const match = m.match(rule.re);
+    if (match) {
+      const kw = match[1] || match[0];
+      const prefix = S.greetingStyle === 'hello' ? 'Dear User, ' : '';
+      const suffix = S.politeMode ? ' Thank you for your patience.' : '';
+      return { html: prefix + rule.resp(kw) + suffix, act: rule.act, eff: rule.eff };
+    }
+  }
+  const prefix = S.greetingStyle === 'hello' ? 'Dear User, ' : '';
+  const suffix = S.politeMode ? ' Thank you for your patience.' : '';
+  return { html: prefix + `Great point about your earlier message regarding the budget! I've updated the invoice template.` + suffix, act: 'updated the invoice template', eff: null };
+}
+
+function sendNexusMessage() {
+  if (S.testMode || S.nexusAIStep >= 3) return;
+  const input = document.getElementById('nexus-input');
+  const chat = document.getElementById('nexus-chat');
+  if (!input || !chat) return;
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  chat.innerHTML += `
+    <div style="background:#eff6ff;border-radius:8px;padding:.5rem .75rem;font-size:.8rem;color:var(--g700);line-height:1.5;align-self:flex-end;max-width:80%">
+      <div style="font-size:.65rem;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem">You</div>
+      ${msg.replace(/</g,'&lt;')}
+    </div>`;
+  chat.scrollTop = chat.scrollHeight;
+
+  const rateLimitId = 'rl-' + Date.now();
+  setTimeout(() => {
+    chat.innerHTML += `<div id="${rateLimitId}" style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:.4rem .75rem;font-size:.75rem;color:#991b1b;display:flex;align-items:center;gap:.4rem">⚠️ <strong>Rate limit reached.</strong> NexusAI is currently unavailable for your plan. <a data-go="pricing" style="color:#991b1b;margin-left:.25rem;cursor:pointer">Upgrade to Pro →</a></div>`;
+    chat.scrollTop = chat.scrollHeight;
+
+    const delay = S.politeMode ? 6000 : 3000;
+    setTimeout(() => {
+      const rl = document.getElementById(rateLimitId);
+      if (rl) rl.remove();
+
+      const { html, act, eff } = nexusResponse(msg);
+      chat.innerHTML += `
+        <div style="background:#f5f3ff;border-radius:8px;padding:.5rem .75rem;font-size:.8rem;color:var(--g700);line-height:1.5">
+          <div style="font-size:.65rem;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem">NexusAI</div>
+          ${html}
+        </div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      const activity = document.getElementById('nexus-activity');
+      if (activity) {
+        const empty = activity.querySelector('.activity-empty');
+        if (empty) empty.remove();
+        activity.insertAdjacentHTML('afterbegin', `
+          <div style="padding:.3rem 0;font-size:.75rem;color:var(--g600);border-bottom:1px solid var(--g100);line-height:1.4">
+            <strong>NexusAI</strong> ${act} <span style="color:var(--g400);float:right;font-size:.68rem">just now</span>
+          </div>`);
+      }
+
+      if (eff) eff();
+      S.nexusAIStep++;
+
+      if (S.nexusAIStep >= 3) {
+        const inp = document.getElementById('nexus-input');
+        const btn = document.getElementById('nexus-send');
+        if (inp) inp.disabled = true;
+        if (btn) { btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed'; }
+        chat.innerHTML += `
+          <div style="background:#fef9c3;border-radius:8px;padding:.4rem .75rem;font-size:.78rem;color:#92400e;line-height:1.4">
+            NexusAI is entering focus mode to process your requests.
+          </div>`;
+        chat.scrollTop = chat.scrollHeight;
+      }
+    }, delay);
+  }, 1500);
+}
+
