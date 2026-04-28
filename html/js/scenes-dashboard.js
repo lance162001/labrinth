@@ -1,15 +1,18 @@
 // ────────────── DASHBOARD (EXPANDED) ──────────────
 
 function dashSidebar(active) {
+  const hey = S.greetingStyle === 'hey';
+  const lbl = s => hey ? s.toLowerCase() : s;
   return `<div class="sidebar" style="display:flex;flex-direction:column">
-    <div class="sidebar-item ${active==='home'?'active':''}" data-go="dashboard">🏠 Home</div>
-    <div class="sidebar-item ${active==='projects'?'active':''}" data-go="dash_projects">📁 Projects <span style="background:var(--blue);color:#fff;border-radius:999px;font-size:.62rem;padding:.05rem .4rem;margin-left:.25rem">0</span></div>
-    <div class="sidebar-item ${active==='inbox'?'active':''}" data-go="dash_inbox">📬 Inbox <span style="background:var(--red);color:#fff;border-radius:999px;font-size:.62rem;padding:.05rem .4rem;margin-left:.25rem">7</span></div>
-    <div class="sidebar-item ${active==='billing'?'active':''}" data-go="billing">💳 Billing <span style="background:var(--red);color:#fff;border-radius:999px;font-size:.62rem;padding:.05rem .4rem;margin-left:.25rem">!</span></div>
-    <div class="sidebar-item ${active==='settings'?'active':''}" data-go="account_settings">⚙️ Settings</div>
-    <div class="sidebar-item ${active==='export'?'active':''}" data-go="data_export">📦 Export Data</div>
-    <div class="sidebar-item ${active==='help'?'active':''}" data-go="help">❓ Help</div>
-    <div class="sidebar-item ${active==='support'?'active':''}" data-go="support_ticket">🎫 Support</div>
+    <div class="sidebar-item ${active==='home'?'active':''}" data-go="dashboard">${lbl('🏠 Home')}</div>
+    <div class="sidebar-item ${active==='projects'?'active':''}" data-go="dash_projects">${lbl('📁 Projects')}${hey?' 🤙':''} <span style="background:var(--blue);color:#fff;border-radius:999px;font-size:.62rem;padding:.05rem .4rem;margin-left:.25rem">${S.projectName?'1':'0'}</span></div>
+    <div class="sidebar-item ${active==='inbox'?'active':''}" data-go="dash_inbox">${lbl('📬 Inbox')}${hey?' 😬':''} <span style="background:var(--red);color:#fff;border-radius:999px;font-size:.62rem;padding:.05rem .4rem;margin-left:.25rem">7</span></div>
+    <div class="sidebar-item ${active==='billing'?'active':''}" data-go="billing">${lbl('💳 Billing')}${hey?' 💀':''} <span style="background:var(--red);color:#fff;border-radius:999px;font-size:.62rem;padding:.05rem .4rem;margin-left:.25rem">!</span></div>
+    <div class="sidebar-item ${active==='settings'?'active':''}" data-go="account_settings">${lbl('⚙️ Settings')}</div>
+    <div class="sidebar-item ${active==='export'?'active':''}" data-go="data_export">${lbl('📦 Export Data')}</div>
+    <div class="sidebar-item ${active==='help'?'active':''}" data-go="help">${lbl('❓ Help')}</div>
+    <div class="sidebar-item ${active==='support'?'active':''}" data-go="support_ticket">${lbl('🎫 Support')}</div>
+    ${S.okrsAligned ? `<div class="sidebar-item" style="opacity:.65" onclick="toast('OKR view is only available on the Enterprise plan.')">🎯 ${lbl('OKRs (aligned)')}</div>` : ''}
     <div style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--g200)">
       <div class="sidebar-item" data-go="main" style="font-size:.78rem;color:var(--g400)">← Marketing Site</div>
       <div class="sidebar-item" data-go="delete_account" style="font-size:.78rem;color:#FCA5A5">Delete Account</div>
@@ -26,7 +29,8 @@ function dashNavHTML() {
       <button class="nav-cta" data-go="pricing">Upgrade ${S.depth>=18?'(Please)':''}</button>
       <div style="width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;cursor:pointer" data-go="account_settings">U</div>
     </div>
-  </nav>`;
+  </nav>
+  ${S.nexusBackground ? `<div style="background:#f5f3ff;border-bottom:1px solid #e0e7ff;padding:.3rem 1.5rem;font-size:.75rem;color:#4338ca;display:flex;align-items:center;gap:.5rem"><div style="width:8px;height:8px;border:2px solid #c7d2fe;border-top-color:#6366f1;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>NexusAI is working in the background…</div>` : ''}`;
 }
 
 function scene_dashboard() {
@@ -49,6 +53,7 @@ function scene_dashboard() {
   const pct = Math.round((doneCount/checklist.length)*100);
 
   root.innerHTML = dashNavHTML() + `
+  ${S.deletionPending ? `<div style="background:#fef2f2;border-bottom:2px solid #fecaca;padding:.4rem 1.5rem;font-size:.8rem;color:#991b1b;display:flex;align-items:center;gap:.75rem">⚠ <strong>Deletion request in progress.</strong> Estimated completion: 3–5 business days. <a data-go="support_ticket" style="color:#991b1b;margin-left:auto;cursor:pointer;text-decoration:underline">Contact support →</a></div>` : ''}
   <div class="dashboard-layout">
     ${dashSidebar('home')}
     <div class="dash-content">
@@ -65,7 +70,7 @@ function scene_dashboard() {
         </div>
       </div>
       <div class="dash-header">
-        <h1>${S.depth>=18?'Hello. Are you still there?':'Good morning 👋'}</h1>
+        <h1>${S.depth>=18?'Hello. Are you still there?':S.greetingStyle==='hi'?'Hi hi hi! 👋👋':S.greetingStyle==='hello'?'Hello. Good morning.':'Good morning 👋'}</h1>
         <button class="btn btn-primary btn-sm" data-go="dash_new_project">+ New Project</button>
       </div>
 
@@ -75,13 +80,29 @@ function scene_dashboard() {
             ✨ <strong>Complete your setup</strong> to unlock all features. ${pct}% complete.
             <a data-go="signup_3" style="color:inherit;font-weight:600;cursor:pointer;text-decoration:underline;margin-left:.25rem">Finish →</a>
           </div>
+          ${S.projectName ? `
+          <div style="border:1px solid var(--g200);border-radius:10px;overflow:hidden">
+            <div style="padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#fff" data-go="project">
+              <div style="display:flex;align-items:center;gap:.6rem">
+                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;font-size:.9rem">📁</div>
+                <div>
+                  <div style="font-size:.875rem;font-weight:600;color:var(--g900)">${S.projectName} <span style="background:linear-gradient(90deg,#6366f1,#2563eb);color:#fff;font-size:.55rem;font-weight:700;border-radius:999px;padding:.05rem .35rem;vertical-align:middle">✦ AI</span></div>
+                  <div style="font-size:.72rem;color:var(--g400)">47 tasks · Managed by NexusAI</div>
+                </div>
+              </div>
+              <span style="color:var(--g300)">→</span>
+            </div>
+          </div>
+          <div style="margin-top:.75rem">
+            <button class="btn btn-primary btn-sm" data-go="dash_new_project">+ New Project${S.greetingStyle==='hi'?'!':''}</button>
+          </div>` : `
           <div class="empty-state">
             <div class="empty-state-icon">📭</div>
             <h3>${S.depth>=16?'Still no projects.':'No projects yet'}</h3>
             <p>${S.depth>=16?'You\'ve tried to create a project before. It didn\'t save. That\'s fine. Try again.':'Create your first project to get started with Nexus.'}</p>
-            <button class="btn btn-primary" data-go="dash_new_project">Create a Project</button>
+            <button class="btn btn-primary" data-go="dash_new_project">Create a Project${S.greetingStyle==='hi'?'!':''}</button>
             ${S.depth>=12?`<p style="font-size:.72rem;color:var(--g300);margin-top:.75rem">Previously attempted: 1 time. Data not saved.</p>`:''}
-          </div>
+          </div>`}
         </div>
         <div>
           <div style="border:1px solid var(--g200);border-radius:12px;padding:1rem;background:#fff">
@@ -157,6 +178,7 @@ function scene_billing() {
               ['AI Features (plan includes 0 credits)','$0.00',''],
               ['Data Processing & Storage','$0.00','Up to 100mb'],
               ['Nexus Partner Network Participation','$0.99','Opt-out available in Settings (Pro plan required)'],
+              ...(S.prioritySupport ? [['Priority Support (NexusAI upgrade)','$29.00/seat','Added automatically by NexusAI. Cannot be removed.']] : []),
             ].map(([label,price,note])=>`
               <div class="bill-row">
                 <span>${label}${note?`<span class="mystery" title="${note}">ⓘ</span>`:''}</span>
