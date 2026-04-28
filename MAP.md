@@ -140,7 +140,8 @@ onboarding (8 steps, all required, ~12 min estimated, takes much longer)
 dashboard
   ├─ Setup checklist (checklist items each link back to incomplete flows)
   ├─ Create Project   → dash_new_project → project modal (4 steps)
-  │                     └─ "Project created!" toast → dashboard [project not saved]
+  │                     └─ "Project created!" toast → project [S.projectName set, garbled]
+  ├─ Project row      → project [visible once S.projectName is set; badge shows 1]
   ├─ Inbox (3 unread) → dash_inbox
   │   ├─ inbox_email_1: 47-item setup checklist (each links to a Nexus scene)
   │   ├─ inbox_email_2: invite teammates reminder (all bounced)
@@ -156,8 +157,32 @@ dashboard
   ├─ chat button      → chat [floating panel, bot script]
   └─ 38s timer        → session_expire → session_extend [timer restarts] or session_reverify
 
+project (NexusAI-managed project interior)
+  ├─ Loads clean: NexusAI welcome message only, activity feed empty
+  ├─ NexusAI input: each Send → 1.5s rate limit → 3s delay → wrong response
+  │   ├─ Keyword extraction lifts one word and misuses it in response
+  │   ├─ 3 exchanges max, then input disables ("focus mode")
+  │   └─ Each keyword may set a persistent S flag (see NexusAI State Effects below)
+  ├─ Toolbar buttons (Views, Settings, Export) → nonfunctional / greyed out
+  ├─ Tabs (Board, Timeline, Goals, etc.) → nonfunctional / greyed out
+  ├─ sidebar: ← Dashboard → dashboard
+  └─ sidebar: Delete Project → delete_account [wrong destination, intentional]
+
+  NexusAI State Effects (persistent for session, visible cross-scene):
+  ├─ "hi"/"sup"/"yo"   → S.greetingStyle='hi'   | dashboard heading: "Hi hi hi! 👋👋", --blue → amber #f59e0b
+  ├─ "hey"             → S.greetingStyle='hey'   | sidebar labels go lowercase, emoji appended
+  ├─ "hello"           → S.greetingStyle='hello' | NexusAI responses gain "Dear User," prefix
+  ├─ "team"/"invite"   → S.invitesSent=true      | Members panel shows Priya K., Marcus T., Deleted User
+  ├─ "delete"/"remove" → S.deletionPending=true  | Red banner in dashboard + project header
+  ├─ "priority"        → S.prioritySupport=true  | Billing gains "Priority Support $29/seat" line item
+  ├─ "test"/"testing"  → S.testMode=true         | NexusAI input disabled
+  ├─ "please"          → S.politeMode=true       | AI delay doubles, appends "Thank you for your patience."
+  ├─ "stop"/"quit"     → S.nexusBackground=true  | Persistent banner: "NexusAI is working in the background…"
+  └─ "milestone"/"okr" → S.okrsAligned=true      | Sidebar gains "🎯 OKRs (aligned)" item
+
 billing (dashboard sidebar)
   ├─ "Free" plan charges $8.96/mo in mandatory fees
+  ├─ If S.prioritySupport: extra line item "Priority Support (NexusAI upgrade) $29.00/seat"
   └─ Add Payment → free_checkout → billing_card_added → billing
                    [order summary: $0.00 today; charges begin tomorrow]
 
@@ -307,7 +332,7 @@ Key narrator beats:
 | 6     | Depth pill appears in top-right corner: "Getting warmer…" |
 | 7     | Cookie banner reappears ("same cookies, new legal basis") |
 | 10    | Dashboard shows "Unusual activity detected" alert |
-| 12    | Dashboard notes prior failed project attempt |
+| 12    | Dashboard notes prior project attempt ("Previously attempted: 1 time. Data not saved.") — only visible before a project is created |
 | 14    | Awareness modal: "We've noticed you. 94th percentile of users." |
 | 15    | Dashboard message changes to "Hello. Are you still there?" |
 | 16    | Empty state copy changes: "Still no projects." |
@@ -335,7 +360,8 @@ home → cookies → loading → newsletter → main → pricing → signup
      → onboard_workspace → onboard_avatar → onboard_calendar
      → onboard_teammates → onboard_usecase → onboard_notifications
      → onboard_video → onboard_quiz → onboard_done → dashboard
-     → dash_new_project → dashboard [empty, 23% setup]
+     → dash_new_project → project [NexusAI interior]
+     → dashboard [project row visible, 23% setup]
 ```
 
 **Narrative structure: rising action with false peaks.**
@@ -358,9 +384,11 @@ After verification comes an eight-step onboarding wizard the system estimates at
 
 The onboarding completion screen shows account setup at 23%, all items flagged red.
 
-The dashboard is empty. The project creation modal runs four steps and reports success. The toast reads: *Project created successfully!* The dashboard is still empty.
+The project creation modal runs four steps and reports success. The toast reads: *Project created successfully!* The user lands in a project interior — clean, almost plausible, managed by NexusAI. The dashboard now shows the project in a list. Everything looks fine.
 
-**Dramatic shape:** ascent → false summit → ascent → false summit → arrival at an empty room that calls itself a destination.
+The moment the user types anything into NexusAI, the rate limiter fires. Then NexusAI responds anyway — to the wrong thing. It has upgraded them to Priority Support. It has sent invitations to their contacts. It is working in the background. The project is still empty.
+
+**Dramatic shape:** ascent → false summit → ascent → false summit → arrival at a room that calls itself a destination and immediately starts rearranging the furniture.
 
 ---
 
