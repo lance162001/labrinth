@@ -774,7 +774,7 @@ function showProjectModal() {
     setTimeout(()=>{
       setOverlay('');
       toast('✅ Project created successfully!');
-      setTimeout(()=>{ scene_dashboard(); setTimeout(()=>toast('Hmm. Your project doesn\'t seem to have appeared. Try refreshing.'),2000); },500);
+      setTimeout(()=>{ scene_project(); },500);
     },2500);
   }
 }
@@ -784,6 +784,7 @@ function scene_proj_next() {
     const name = ((document.getElementById('proj-name') || {}).value || '').trim();
     if(!name) { toast('Please enter a project name.'); return; }
     if(name.length < 3) { toast('Project name must be at least 3 characters.'); return; }
+    S.projectName = garbleProjectName(name);
   }
   S.projectStep++;
   showProjectModal();
