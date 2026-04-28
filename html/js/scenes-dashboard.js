@@ -421,6 +421,91 @@ function scene_project() {
   clearTimeout(S.sessionTimer);
   clearSocialProof();
   setOverlay('');
-  root.innerHTML = dashNavHTML() + `<div style="padding:2rem">Loading project…</div>`;
+
+  const gn = S.projectName || garbleProjectName('My Project');
+  const membersContent = S.invitesSent
+    ? ['Priya K.','Marcus T.','Deleted User'].map(n=>`
+        <div style="display:flex;align-items:center;gap:.5rem;padding:.3rem 0;font-size:.78rem;color:var(--g600)">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--g200);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--g500)">${n[0]}</div>
+          ${n} <span style="margin-left:auto;font-size:.65rem;color:var(--g400)">invite pending</span>
+        </div>`).join('')
+    : '<div style="font-size:.72rem;color:var(--g400)">0 members · <span style="color:var(--g300);cursor:not-allowed">Invite (unavailable)</span></div>';
+
+  root.innerHTML = dashNavHTML() + `
+  ${S.deletionPending ? `<div style="background:#fef2f2;border-bottom:2px solid #fecaca;padding:.4rem 1.5rem;font-size:.8rem;color:#991b1b;display:flex;align-items:center;gap:.75rem">⚠ <strong>Deletion request in progress.</strong> Estimated completion: 3–5 business days.</div>` : ''}
+  <div style="background:#fff;border-bottom:1px solid var(--g200);padding:.6rem 1.5rem;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:1rem;font-weight:700">
+      📁 ${gn}
+      <span style="background:linear-gradient(90deg,#6366f1,#2563eb);color:#fff;font-size:.6rem;font-weight:700;border-radius:999px;padding:.1rem .4rem">✦ NexusAI</span>
+      <span style="font-size:.7rem;color:var(--g400);font-weight:400">Managed by NexusAI</span>
+      ${S.deletionPending ? '<span style="font-size:.7rem;color:#ef4444;font-weight:500;margin-left:.25rem">⚠ Pending deletion</span>' : ''}
+    </div>
+    <div style="display:flex;gap:.4rem">
+      <button style="border:1px solid var(--g200);background:#fff;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:var(--g400);cursor:not-allowed;opacity:.5">📊 Views</button>
+      <button style="border:1px solid var(--g200);background:#fff;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:var(--g400);cursor:not-allowed;opacity:.5">⚙️ Settings</button>
+      <button style="border:1px solid var(--g200);background:#fff;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:var(--g400);cursor:not-allowed;opacity:.5">📤 Export</button>
+      <button style="border:1px solid var(--g200);background:#f9fafb;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:var(--g600)" onclick="toast('Share link copied! (link expired)')">👥 Share</button>
+    </div>
+  </div>
+  <div style="background:#fff;border-bottom:1px solid var(--g200);padding:0 1.5rem;display:flex;overflow-x:auto">
+    ${['✦ AI Assistant','Board','Timeline','Goals','Docs BETA','Sprints','Reports','Automations !'].map((t,i)=>`
+      <div style="padding:.6rem .9rem;font-size:.8rem;white-space:nowrap;border-bottom:2px solid ${i===0?'#6366f1':'transparent'};color:${i===0?'#6366f1':'var(--g400)'};font-weight:${i===0?'600':'400'};cursor:${i===0?'default':'not-allowed'};opacity:${i===0?'1':'.55'}">${t}</div>`).join('')}
+  </div>
+  <div class="dashboard-layout">
+    <div class="sidebar" style="display:flex;flex-direction:column">
+      <div style="padding:.4rem .75rem;font-size:.78rem;color:var(--g500);cursor:pointer;display:flex;align-items:center;gap:.4rem;border-radius:6px;margin:.4rem" data-go="dashboard">← Dashboard</div>
+      <div style="padding:.25rem .75rem;font-size:.68rem;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin:.3rem 0 .1rem">Project</div>
+      <div class="sidebar-item active">✦ AI Assistant</div>
+      <div class="sidebar-item" style="color:var(--g300);cursor:not-allowed">📋 Tasks <span style="background:var(--g100);color:var(--g400);border-radius:999px;font-size:.6rem;padding:.05rem .35rem;margin-left:auto">—</span></div>
+      <div class="sidebar-item" style="color:var(--g300);cursor:not-allowed">👥 Members <span style="background:var(--g100);color:var(--g400);border-radius:999px;font-size:.6rem;padding:.05rem .35rem;margin-left:auto">${S.invitesSent?'3':'0'}</span></div>
+      <div class="sidebar-item" style="color:var(--g300);cursor:not-allowed">📎 Files <span style="background:var(--g100);color:var(--g400);border-radius:999px;font-size:.6rem;padding:.05rem .35rem;margin-left:auto">—</span></div>
+      <div class="sidebar-item" style="color:var(--g300);cursor:not-allowed">🔗 Integrations <span style="background:var(--red);color:#fff;border-radius:999px;font-size:.6rem;padding:.05rem .35rem;margin-left:auto">!</span></div>
+      <div style="margin-top:auto;padding-top:1rem;border-top:1px solid var(--g200)">
+        <div class="sidebar-item" style="font-size:.78rem;color:#FCA5A5" data-go="delete_account">🗑 Delete Project</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 260px;gap:1rem;padding:1rem 1.25rem;align-items:start">
+      <div style="background:#fff;border:1.5px solid #6366f1;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(99,102,241,.12)">
+        <div style="background:linear-gradient(90deg,#6366f1,#2563eb);color:#fff;padding:.6rem 1rem;font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:.4rem">
+          ✦ NexusAI — Intelligent Project Manager
+          <span style="font-size:.68rem;font-weight:400;opacity:.8;margin-left:auto">● Online</span>
+        </div>
+        <div id="nexus-chat" style="min-height:220px;max-height:280px;padding:.75rem 1rem;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem">
+          <div style="background:#f5f3ff;border-radius:8px;padding:.5rem .75rem;font-size:.8rem;color:var(--g700);line-height:1.5">
+            <div style="font-size:.65rem;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem">NexusAI</div>
+            ${S.greetingStyle==='hello'?'Dear User, ':''}Hi! I'm NexusAI, your intelligent project manager. Ask me anything about <em>${gn}</em> or tell me what to do first.${S.politeMode?' Thank you for your patience.':''}
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--g200);padding:.6rem .75rem;display:flex;gap:.5rem">
+          <input id="nexus-input" type="text" placeholder="Ask NexusAI anything about your project…" style="flex:1;border:1px solid var(--g200);border-radius:6px;padding:.4rem .7rem;font-size:.82rem;outline:none;color:var(--g800)" onkeydown="if(event.key==='Enter')sendNexusMessage()" ${S.testMode||S.nexusAIStep>=3?'disabled':''}>
+          <button id="nexus-send" onclick="sendNexusMessage()" style="background:#6366f1;color:#fff;border:none;border-radius:6px;padding:.4rem .85rem;font-size:.8rem;font-weight:600;cursor:pointer" ${S.testMode||S.nexusAIStep>=3?'disabled':''}>${S.testMode||S.nexusAIStep>=3?'<span style="opacity:.4">Send</span>':'Send'}</button>
+        </div>
+        ${S.testMode?'<div style="padding:.4rem 1rem;font-size:.72rem;color:var(--g400);background:#f9fafb;border-top:1px solid var(--g200)">🔒 NexusAI is in Test Mode. Input disabled.</div>':''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <div style="background:#fff;border:1px solid var(--g200);border-radius:10px;padding:.75rem 1rem">
+          <div style="font-size:.75rem;font-weight:700;color:var(--g700);margin-bottom:.5rem;display:flex;justify-content:space-between">Members <span style="font-weight:400;color:var(--g300);cursor:not-allowed;font-size:.7rem">Invite (unavailable)</span></div>
+          ${membersContent}
+        </div>
+        <div style="background:#fff;border:1px solid var(--g200);border-radius:10px;padding:.75rem 1rem">
+          <div style="font-size:.75rem;font-weight:700;color:var(--g700);margin-bottom:.5rem;display:flex;justify-content:space-between">Activity <span style="font-size:.68rem;color:var(--g300)">loading…</span></div>
+          <div id="nexus-activity"><div class="activity-empty" style="font-size:.75rem;color:var(--g400);font-style:italic">No activity yet.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--g200);border-radius:10px;padding:.75rem 1rem">
+          <div style="font-size:.75rem;font-weight:700;color:var(--g700);margin-bottom:.5rem">NexusAI Status</div>
+          <div style="font-size:.75rem;color:var(--g600);line-height:1.8">
+            <div>Tasks created: <strong>47</strong></div>
+            <div>Tasks archived: <strong>47</strong></div>
+            <div>Actions taken: <strong style="color:#6366f1">∞</strong></div>
+            <div style="margin-top:.35rem;color:var(--g300);font-size:.68rem">⟳ Optimizing workspace…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  if (S.greetingStyle === 'hi') document.documentElement.style.setProperty('--blue', '#f59e0b');
+  injectChatBtn();
+  S.sessionTimer = setTimeout(() => scene_session_expire(), 38000);
 }
 
