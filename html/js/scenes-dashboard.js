@@ -408,3 +408,19 @@ function scene_settings_pw_resend() {
   toast('Code resent to phone ending in ••••. Note: no phone number is registered on your account.');
 }
 
+// ────────────── PROJECT INTERIOR ──────────────
+
+function garbleProjectName(name) {
+  const s = (name || 'My Project').trim();
+  return s + s[s.length - 1];
+}
+
+function scene_project() {
+  incDepth();
+  S.nexusAIStep = 0;
+  clearTimeout(S.sessionTimer);
+  clearSocialProof();
+  setOverlay('');
+  root.innerHTML = dashNavHTML() + `<div style="padding:2rem">Loading project…</div>`;
+}
+

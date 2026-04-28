@@ -41,6 +41,7 @@ const SCENES = {
   dash_inbox: scene_dash_inbox,
   dash_settings: scene_dash_settings,
   dash_new_project: scene_dash_new_project,
+  project: scene_project,
   proj_next: scene_proj_next,
   proj_back: scene_proj_back,
   contact_sales: scene_contact_sales,
