@@ -35,6 +35,16 @@ const S = {
   exportGlitchTimer: null,
   blogVisits: 0,
   lastBlogEra: '',
+  projectName: '',
+  nexusAIStep: 0,
+  greetingStyle: '',
+  invitesSent: false,
+  deletionPending: false,
+  prioritySupport: false,
+  testMode: false,
+  politeMode: false,
+  nexusBackground: false,
+  okrsAligned: false,
 };
 
 function incDepth() {
