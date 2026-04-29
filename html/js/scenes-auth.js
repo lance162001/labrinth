@@ -36,13 +36,23 @@ function scene_signin_actual() {
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" placeholder="••••••••">
+      <input type="password" placeholder="••••••••" id="si-pass">
     </div>
-    <button class="btn btn-primary" style="width:100%;margin-bottom:.75rem" data-go="signin_sso">Sign In →</button>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:.75rem" onclick="checkSignin()">Sign In →</button>
     <p style="text-align:center;font-size:.8rem;color:var(--g500)">Forgot password? <a data-go="forgot_password" style="color:var(--blue);cursor:pointer">Reset it</a></p>
   </div>`;
   setOverlay('');
 }
+
+window.checkSignin = function() {
+  const email = (document.getElementById('si-email')?.value || '').trim();
+  const pass = document.getElementById('si-pass')?.value || '';
+  if (email === 'labrinth@nexus.app' && pass === 'd3pth0') {
+    scene_secret_site();
+  } else {
+    scene_signin_sso();
+  }
+};
 
 function scene_signin_sso() {
   setOverlay(`
