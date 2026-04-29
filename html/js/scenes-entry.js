@@ -383,7 +383,8 @@ function scene_cool_links() {
     <div style="background:#c0c0c0;text-align:center;font-size:.6rem;font-family:Arial;color:#000;padding:.35rem;border-top:2px solid #888;margin-top:1rem">
       © 1998 Nexus™ Corporation. Cool Links Curator: <em>webmaster@nexus.com</em>. Updated monthly (or whenever we remember).
     </div>
-  </div>`;
+  </div>
+  ${fragHotspot('k1', 'k·1', 'labrinth', '14%', '84%')}`;
 }
 
 function scene_sitemap() {

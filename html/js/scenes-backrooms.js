@@ -117,6 +117,14 @@ function brStage1(slot, displayNum, roomArg) {
     '<div style="height:4px;background:var(--g100);border-radius:2px;margin-bottom:1.5rem"><div style="width:100%;height:100%;background:var(--blue);border-radius:2px"></div></div>' +
     '<div style="margin-top:2rem"><button class="btn btn-primary" data-go="backrooms_next">Continue →</button></div>');
 
+  if (slot === 13) return shell(
+    '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Diagnostic Console</h1>' +
+    '<div style="font-size:.875rem;color:var(--g500);margin-bottom:1.25rem">You are in Room ' + displayNum + '.</div>' +
+    '<div style="font-size:.72rem;color:var(--g400);font-style:italic;margin-bottom:.4rem">Something is in this room.</div>' +
+    '<div style="font-size:.68rem;color:var(--g300);margin-bottom:2rem">You cannot see it. It has been here longer than you have.</div>' +
+    '<div style="margin-top:1.5rem"><button class="btn btn-primary" data-go="backrooms_next">Proceed →</button></div>' +
+    fragHotspot('k2', 'k·2', '@nexus', '31%', '88%'));
+
   if (slot === 15) return shell(
     '<h1 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Features</h1>' +
     '<div style="background:#000;border-radius:6px;padding:2rem;text-align:center;margin-bottom:1rem">' +

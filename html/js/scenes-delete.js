@@ -330,7 +330,8 @@ function scene_del_committee() {
         <button style="padding:.6rem 1rem;background:none;border:1px solid rgba(255,255,255,.04);color:#2a2a2a;border-radius:3px;cursor:pointer;font-family:Georgia,serif;font-size:.78rem" data-go="dashboard">Return to Dashboard</button>
       </div>
     </div>
-  </div>`;
+  </div>
+  ${fragHotspot('c3', 'c·3', 'h0', '23%', '92%')}`;
 }
 
 function scene_del_cancel_request() {

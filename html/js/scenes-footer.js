@@ -241,6 +241,7 @@ function scene_careers_apply() {
         <div><strong>Assessment:</strong> ⚠ Pending (must be completed separately)</div>
       </div>
       <div style="font-size:.72rem;color:var(--g400);margin-bottom:1rem;line-height:1.5">By submitting this application you agree to our Candidate Privacy Policy, Data Retention Policy, and confirm all information is accurate to the best of your knowledge. Submitting a false application is grounds for immediate disqualification and possible legal action.</div>
+      ${step===8?fragHotspot('k3', 'k·3', '.app', '12%', '7%'):''}
     `:''}
     <div style="display:flex;gap:.75rem;margin-top:1.5rem">
       ${step>0?`<button class="btn btn-secondary" onclick="S.careersStep--;scene_careers_apply()">← Back</button>`:'<button class="btn btn-secondary" data-go="careers">← All Jobs</button>'}

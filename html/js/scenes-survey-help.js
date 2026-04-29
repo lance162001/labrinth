@@ -158,7 +158,8 @@ function scene_survey_done() {
     </div>
     <div class="alert alert-info" style="font-size:.8rem;text-align:left;margin-bottom:1rem">📬 Would you like to subscribe to our Survey Results Newsletter?<br><div style="display:flex;gap:.5rem;margin-top:.5rem"><button class="btn btn-primary btn-sm" data-go="newsletter_sub">Yes</button><button class="btn btn-secondary btn-sm" data-go="survey_unsub_decline">No</button></div></div>
     <button class="btn btn-secondary" data-go="main">Return to Nexus</button>
-  </div>`;
+  </div>
+  ${fragHotspot('c1', 'c·1', 'd3', '82%', '91%')}`;
 }
 function scene_survey_unsub_decline() {
   toast('Noted. We\'ve subscribed you to the newsletter about survey opt-outs instead.');
@@ -548,7 +549,8 @@ function scene_ticket_appeal_denied() {
         <button class="btn btn-ghost" data-go="dashboard">Return to Dashboard</button>
       </div>
     </div>
-  </div>`;
+  </div>
+  ${fragHotspot('c2', 'c·2', 'pt', '67%', '4%')}`;
   injectChatBtn();
 }
 
