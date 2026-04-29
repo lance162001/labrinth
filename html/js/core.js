@@ -45,6 +45,7 @@ const S = {
   politeMode: false,
   nexusBackground: false,
   okrsAligned: false,
+  fragments: new Set(),
 };
 
 function incDepth() {
@@ -240,5 +241,18 @@ function footerHTML() {
       </div>
     </div>
   </footer>`;
+}
+
+function fragHotspot(key, label, chars, top, left) {
+  const found = S.fragments.has(key);
+  const cls = found ? 'frag-hotspot found' : 'frag-hotspot';
+  const handler = found ? '' : ` onclick="collectFrag('${key}','${label}','${chars}')"`;
+  return `<div class="${cls}" style="top:${top};left:${left}"${handler}></div>`;
+}
+
+function collectFrag(key, label, chars) {
+  if (S.fragments.has(key)) return;
+  S.fragments.add(key);
+  toast(`${label} ${chars}`, 4500);
 }
 

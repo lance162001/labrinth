@@ -500,6 +500,10 @@ body.br-deep{background:#0d0a06}
 body.br-fc-1 .nav-links{font-family:'Courier New',monospace}
 body.br-fc-2 .nav-links,.br-fc-2 .btn{font-family:'Courier New',monospace}
 body.br-fc-3 .nav-links,.br-fc-3 .btn,.br-fc-3 h1,.br-fc-3 .hero-h1{font-family:'Courier New',monospace}
+.frag-hotspot{position:fixed;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.8);z-index:999;opacity:0;pointer-events:all}
+.frag-hotspot:hover:not(.found){cursor:crosshair;animation:frag-pulse 1.5s ease-in-out infinite}
+.frag-hotspot.found{opacity:.1;animation:none}
+@keyframes frag-pulse{0%,100%{opacity:0}50%{opacity:.7}}
 </style>
 </head>
 <body>
