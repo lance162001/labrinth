@@ -165,6 +165,7 @@ const SCENES = {
   adv_examine_desk: scene_adv_examine_desk,
   adv_use_exit: scene_adv_use_exit,
   adv_ending: scene_adv_ending,
+  secret_site: scene_secret_site,
 };
 
 document.addEventListener('click', e => {
