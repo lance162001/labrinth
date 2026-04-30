@@ -1,4 +1,5 @@
 .superpowers
+.claude/
 docs/superpowers/
 html/js/secret-config.js
 *.swp
