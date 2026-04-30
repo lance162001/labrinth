@@ -1,3 +1,6 @@
 .superpowers
 docs/superpowers/
 html/js/secret-config.js
+*.swp
+*.kate-swp
+todo.txt

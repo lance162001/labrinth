@@ -232,7 +232,7 @@ function scene_main_render() {
 
   <div style="background:linear-gradient(135deg,var(--blue),#7C3AED);padding:5rem 2rem;text-align:center;color:#fff">
     <h2 style="font-size:2.25rem;font-weight:800;letter-spacing:-.03em;margin-bottom:1rem">Ready to transform your workflow?</h2>
-    <p style="opacity:.8;margin-bottom:2rem;font-size:1rem">Join thousands of teams. Start free. Upgrade when you hit a wall we built intentionally.</p>
+    <p style="opacity:.8;margin-bottom:2rem;font-size:1rem">Join thousands of teams. Start free. Upgrade when you're ready for more.</p>
     <button class="btn btn-lg" style="background:#fff;color:var(--blue)" data-go="pricing">Get Started Free →</button>
   </div>
 

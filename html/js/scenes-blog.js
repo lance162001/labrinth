@@ -327,7 +327,7 @@ function scene_blog_livejournal() {
         <div style="background:#f0edd8;border:1px solid #c8c4a8;margin-bottom:.85rem;padding:.85rem">
           <div style="font-size:.65rem;color:#666;margin-bottom:.3rem"><strong>${p.date.toLowerCase()}</strong> | <strong>${p.author}</strong></div>
           <div style="font-size:.85rem;font-weight:700;color:#5b3f5b;margin-bottom:.3rem;cursor:pointer" data-go="blog">${p.title}</div>
-          <div style="font-size:.6rem;color:#7a6a7a;font-style:italic;margin-bottom:.5rem">current mood: productive 📊 &nbsp;·&nbsp; music: lo-fi beats to synergize to</div>
+          <div style="font-size:.6rem;color:#7a6a7a;font-style:italic;margin-bottom:.5rem">current mood: productive 📊 &nbsp;·&nbsp; music: something from the work playlist</div>
           <div style="font-size:.75rem;color:#444;line-height:1.6;margin-bottom:.65rem">${ljExcerpts[i]}</div>
           <div style="font-size:.6rem;color:#666;display:flex;gap:.75rem;flex-wrap:wrap">
             <span>filed under: <a data-go="blog" style="color:#5b3f5b;cursor:pointer">${p.cats}</a></span>
